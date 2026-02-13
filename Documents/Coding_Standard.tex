@@ -1,0 +1,429 @@
+\documentclass[11pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+
+% Colors
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{codegreen}{rgb}{0.0,0.5,0.0}
+\definecolor{codepurple}{rgb}{0.58,0.0,0.82}
+\definecolor{sectionblue}{rgb}{0.2,0.4,0.6}
+
+% Code listing style
+\lstset{
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    captionpos=b,
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numbers=none,
+    frame=single,
+    framesep=5pt,
+    xleftmargin=10pt,
+    xrightmargin=10pt
+}
+
+% Section formatting
+\titleformat{\section}
+{\color{sectionblue}\Large\bfseries}
+{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\color{sectionblue}\large\bfseries}
+{\thesubsection}{1em}{}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textit{Software Project Naming Standards}}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Document info
+\title{\textbf{\Huge Project Naming Standards}\\[0.5em]\large A Practical Reference for Consistent Code}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+\noindent A practical reference for maintaining consistent, readable, and professional naming across the project. These standards reduce cognitive overhead, make codebases easier to navigate, and ensure your work remains understandable to your future self --- not just collaborators. Designed to be lightweight enough for a solo developer while laying the groundwork for scaling to a team.
+\end{abstract}
+
+\vspace{1em}
+
+\tableofcontents
+\newpage
+
+\section{Repositories \& Folders}
+
+\subsection{Repository Names}
+
+\begin{itemize}[leftmargin=*]
+    \item Use \textbf{lowercase kebab-case} (words separated by hyphens): \texttt{my-project}, \texttt{api-service}, \texttt{data-pipeline}
+    \item Be descriptive but concise --- aim for 2--4 words
+    \item Prefix with a category where helpful: \texttt{lib-}, \texttt{api-}, \texttt{cli-}, \texttt{app-}
+    \item Avoid generic names like \texttt{project1}, \texttt{test}, or \texttt{new-repo}
+\end{itemize}
+
+\vspace{0.5em}
+\noindent\textbf{Examples:}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textcolor{green!60!black}{\checkmark} \textbf{Good} & \textcolor{red}{\texttimes} \textbf{Avoid} \\
+\midrule
+\texttt{invoice-parser} & \texttt{InvoiceParser} \\
+\texttt{api-auth-service} & \texttt{myproject\_v2} \\
+\texttt{cli-deploy-tool} & \texttt{stuff} \\
+\texttt{lib-date-utils} & \texttt{NEW\_repo} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Folder / Directory Names}
+
+\begin{itemize}[leftmargin=*]
+    \item Use \textbf{lowercase kebab-case} for project directories: \texttt{src/}, \texttt{user-profiles/}, \texttt{email-templates/}
+    \item Use conventional names for standard directories
+    \item Group files by \textbf{feature} rather than type in larger projects (e.g., \texttt{src/auth/} rather than putting all models in \texttt{src/models/})
+\end{itemize}
+
+\vspace{0.5em}
+\noindent\textbf{Standard directories:}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Directory} & \textbf{Purpose} \\
+\midrule
+\texttt{src/} & Source code \\
+\texttt{tests/} & Test files \\
+\texttt{docs/} & Documentation \\
+\texttt{assets/} & Static files (images, fonts, etc.) \\
+\texttt{scripts/} & Utility/build scripts \\
+\texttt{config/} & Configuration files \\
+\texttt{dist/} or \texttt{build/} & Compiled output \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Branches \& Commits}
+
+\subsection{Branch Names}
+
+Follow the pattern: \texttt{<type>/<short-description>}
+
+\vspace{0.5em}
+\noindent\textbf{Branch types:}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Type} & \textbf{Use for} \\
+\midrule
+\texttt{feature/} & New features or enhancements \\
+\texttt{fix/} & Bug fixes \\
+\texttt{hotfix/} & Urgent production fixes \\
+\texttt{chore/} & Maintenance, refactoring, dependency updates \\
+\texttt{docs/} & Documentation changes only \\
+\texttt{test/} & Adding or updating tests \\
+\texttt{experiment/} & Exploratory / throwaway work \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.5em}
+\noindent\textbf{Examples:}
+
+\begin{lstlisting}
+feature/user-authentication
+fix/null-pointer-on-login
+hotfix/payment-gateway-timeout
+chore/upgrade-node-18
+docs/update-readme-setup
+\end{lstlisting}
+
+\noindent\textbf{Rules:}
+\begin{itemize}[leftmargin=*]
+    \item Use \textbf{lowercase kebab-case} only
+    \item Keep descriptions short but meaningful (3--5 words max)
+    \item Reference a ticket/issue number if applicable: \texttt{fix/gh-42-login-redirect}
+    \item Avoid vague names like \texttt{my-branch}, \texttt{wip}, or \texttt{temp}
+\end{itemize}
+
+\subsection{Commit Messages}
+
+Follow the \textbf{Conventional Commits} format:
+
+\begin{center}
+\texttt{<type>(<scope>): <short summary>}
+\end{center}
+
+\vspace{0.5em}
+\noindent\textbf{Commit types:}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Type} & \textbf{Use for} \\
+\midrule
+\texttt{feat} & A new feature \\
+\texttt{fix} & A bug fix \\
+\texttt{docs} & Documentation only \\
+\texttt{style} & Formatting, no logic change \\
+\texttt{refactor} & Code restructure, no feature/fix \\
+\texttt{test} & Adding or updating tests \\
+\texttt{chore} & Build process, dependencies \\
+\texttt{perf} & Performance improvements \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.5em}
+\noindent\textbf{Examples:}
+
+\begin{lstlisting}
+feat(auth): add JWT refresh token support
+fix(api): handle empty response from payment gateway
+docs(readme): add local setup instructions
+refactor(db): extract query builder into utility module
+chore: upgrade eslint to v9
+\end{lstlisting}
+
+\noindent\textbf{Rules:}
+\begin{itemize}[leftmargin=*]
+    \item Use the \textbf{imperative mood} in the summary: ``add'', not ``added'' or ``adds''
+    \item Keep the summary under 72 characters
+    \item Use the body (optional) for \textit{why}, not \textit{what} --- the diff already shows what changed
+    \item Never commit with messages like \texttt{fix}, \texttt{update}, \texttt{changes}, or \texttt{asdfgh}
+\end{itemize}
+
+\section{Variables \& Functions}
+
+\subsection{General Rules}
+
+\begin{itemize}[leftmargin=*]
+    \item Prioritize \textbf{clarity over brevity} --- \texttt{userAuthToken} beats \texttt{uat}
+    \item Avoid single-letter names except for loop counters (\texttt{i}, \texttt{j}) or mathematical functions (\texttt{x}, \texttt{y})
+    \item Be consistent with the conventions of the language you're using
+\end{itemize}
+
+\subsection{Variables}
+
+Use \textbf{camelCase} in most languages (JavaScript, TypeScript, Java, Swift):
+
+\begin{lstlisting}[language=JavaScript]
+const userEmail = "hello@example.com";
+let isAuthenticated = false;
+const maxRetryCount = 3;
+\end{lstlisting}
+
+Use \textbf{snake\_case} in Python and Ruby:
+
+\begin{lstlisting}[language=Python]
+user_email = "hello@example.com"
+is_authenticated = False
+max_retry_count = 3
+\end{lstlisting}
+
+\noindent\textbf{Constants} --- use \texttt{UPPER\_SNAKE\_CASE}:
+
+\begin{lstlisting}[language=JavaScript]
+const MAX_FILE_SIZE_MB = 10;
+const API_BASE_URL = "https://api.example.com";
+\end{lstlisting}
+
+\noindent\textbf{Boolean variables} --- prefix with \texttt{is}, \texttt{has}, \texttt{should}, \texttt{can}, or \texttt{will}:
+
+\begin{lstlisting}[language=JavaScript]
+isLoading, hasPermission, shouldRedirect, canEdit, willExpire
+\end{lstlisting}
+
+\subsection{Functions \& Methods}
+
+\begin{itemize}[leftmargin=*]
+    \item Use \textbf{verbs} --- functions do things: \texttt{getUser()}, \texttt{validateEmail()}, \texttt{sendNotification()}
+    \item Be specific: \texttt{fetchUserById()} is better than \texttt{getUser()}
+\end{itemize}
+
+\vspace{0.5em}
+\noindent\textbf{Common prefixes:}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Prefix} & \textbf{Use for} \\
+\midrule
+\texttt{get} / \texttt{fetch} & Retrieve data \\
+\texttt{set} & Assign a value \\
+\texttt{create} / \texttt{build} & Construct something new \\
+\texttt{update} / \texttt{save} & Modify existing data \\
+\texttt{delete} / \texttt{remove} & Remove data \\
+\texttt{validate} / \texttt{check} & Verify something \\
+\texttt{handle} / \texttt{on} & Event handlers \\
+\texttt{format} / \texttt{parse} & Transform data \\
+\texttt{is} / \texttt{has} & Return a boolean \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.5em}
+\noindent\textbf{Examples:}
+
+\begin{lstlisting}[language=JavaScript]
+function fetchUserById(userId) { ... }
+function validateEmailFormat(email) { ... }
+function handleFormSubmit(event) { ... }
+function formatCurrencyUSD(amount) { ... }
+\end{lstlisting}
+
+\subsection{Classes \& Types}
+
+Use \textbf{PascalCase}:
+
+\begin{lstlisting}[language=JavaScript]
+class UserAuthService { ... }
+type ApiResponse = { ... }
+interface DatabaseConfig { ... }
+enum UserRole { Admin, Editor, Viewer }
+\end{lstlisting}
+
+\section{Databases \& Tables}
+
+\subsection{Table Names}
+
+\begin{itemize}[leftmargin=*]
+    \item Use \textbf{lowercase snake\_case}
+    \item Use \textbf{plural nouns}: \texttt{users}, \texttt{orders}, \texttt{product\_categories}
+    \item Be descriptive: \texttt{email\_verification\_tokens} not \texttt{evt}
+    \item Avoid generic names like \texttt{data}, \texttt{records}, \texttt{items}
+\end{itemize}
+
+\vspace{0.5em}
+\noindent\textbf{Examples:}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textcolor{green!60!black}{\checkmark} \textbf{Good} & \textcolor{red}{\texttimes} \textbf{Avoid} \\
+\midrule
+\texttt{users} & \texttt{User} \\
+\texttt{order\_items} & \texttt{tbl\_order\_items} \\
+\texttt{refresh\_tokens} & \texttt{tokens2} \\
+\texttt{product\_categories} & \texttt{prodCat} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.5em}
+\noindent\textit{Note:} Some ORMs and conventions use singular table names (\texttt{user} instead of \texttt{users}). Either is acceptable --- pick one and stick with it.
+
+\subsection{Column Names}
+
+\begin{itemize}[leftmargin=*]
+    \item Use \textbf{lowercase snake\_case}: \texttt{first\_name}, \texttt{created\_at}, \texttt{is\_active}
+    \item Be explicit about units where relevant: \texttt{file\_size\_bytes}, \texttt{timeout\_seconds}
+    \item Avoid abbreviations: \texttt{description} not \texttt{desc}, \texttt{quantity} not \texttt{qty}
+\end{itemize}
+
+\vspace{0.5em}
+\noindent\textbf{Standard column conventions:}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Column} & \textbf{Purpose} \\
+\midrule
+\texttt{id} & Primary key (or \texttt{user\_id} for clarity in joins) \\
+\texttt{created\_at} & Timestamp of record creation \\
+\texttt{updated\_at} & Timestamp of last update \\
+\texttt{deleted\_at} & Soft delete timestamp (nullable) \\
+\texttt{is\_active} & Boolean status flag \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Indexes \& Constraints}
+
+Follow the pattern: \texttt{<type>\_<table>\_<columns>}
+
+\begin{lstlisting}[language=SQL]
+-- Index
+idx_users_email
+idx_orders_created_at
+
+-- Unique constraint
+uq_users_email
+
+-- Foreign key
+fk_orders_user_id
+
+-- Primary key
+pk_users
+\end{lstlisting}
+
+\subsection{Database \& Schema Names}
+
+\begin{itemize}[leftmargin=*]
+    \item Use \textbf{lowercase snake\_case}: \texttt{my\_app\_db}, \texttt{analytics\_schema}
+    \item Separate environments clearly: \texttt{myapp\_dev}, \texttt{myapp\_staging}, \texttt{myapp\_prod}
+\end{itemize}
+
+\section{Quick Reference Cheat Sheet}
+
+\begin{center}
+\small
+\begin{longtable}{lll}
+\toprule
+\textbf{Item} & \textbf{Convention} & \textbf{Example} \\
+\midrule
+\endfirsthead
+\multicolumn{3}{c}{\textit{(continued from previous page)}} \\
+\toprule
+\textbf{Item} & \textbf{Convention} & \textbf{Example} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\textit{(continued on next page)}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+Repository & \texttt{kebab-case} & \texttt{invoice-parser} \\
+Directory & \texttt{kebab-case} & \texttt{user-profiles/} \\
+Git branch & \texttt{type/kebab-case} & \texttt{feature/add-login} \\
+Commit & \texttt{type(scope): summary} & \texttt{fix(auth): handle expired token} \\
+Variable (JS/TS) & \texttt{camelCase} & \texttt{userEmail} \\
+Variable (Python) & \texttt{snake\_case} & \texttt{user\_email} \\
+Constant & \texttt{UPPER\_SNAKE\_CASE} & \texttt{MAX\_RETRY\_COUNT} \\
+Function & \texttt{camelCase} verb & \texttt{fetchUserById()} \\
+Class / Type & \texttt{PascalCase} & \texttt{UserAuthService} \\
+DB table & \texttt{plural\_snake\_case} & \texttt{order\_items} \\
+DB column & \texttt{snake\_case} & \texttt{created\_at} \\
+DB index & \texttt{idx\_table\_column} & \texttt{idx\_users\_email} \\
+\end{longtable}
+\end{center}
+
+\vspace{2em}
+
+\begin{center}
+\Large\textit{Consistency matters more than perfection.}\\
+\large\textit{When in doubt, follow the existing pattern in your codebase.}
+\end{center}
+
+\end{document}

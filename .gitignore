@@ -198,3 +198,7 @@ memory.db
 *.fls
 *.log
 *.synctex.gz
+
+# exclude drawio
+*.drawio
+*.drawio.bkp

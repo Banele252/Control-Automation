@@ -1,5 +1,7 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
+\usepackage{geometry}
+\geometry{margin=3cm}
 
 \title{Control automation}
 \author{Author: Banele Mdluli}
@@ -69,7 +71,7 @@ The project objectives are targets that must be reached for the project to be co
     \item Database and data engineering tools
     \begin{itemize}
         \item Superbase to store raw data
-        \item Azure data factory to trigger jobs
+        \item Azure data factory to trigger pipelines, based on event, schedule or tumbling window.
         \item Databricks to create externally managed tables for control performance.
         \item Postgres to store Control outcome results and interaction logs
     \end{itemize}
@@ -97,18 +99,119 @@ The project objectives are targets that must be reached for the project to be co
         \end{itemize}
         \item Deployement platform, code repo and CI/CD
         \begin{itemize}
-            
             \item Azure
             \item Github
             \item Github actions  (switch to Azure Dev Ops later)
     \end{itemize}
  \end{itemize}
 
-\section{Design}
+\section{Design (Architecture)}
+The section focuses on showing how each component of the project interacts with the other. It is divided into two parts, HLD and LLD.
  \subsection{HLD (High level design)}
+  HLD will show how each unit of component interact with another another unit. The HLD will be divide into following groups Data storage, Cloud services,
+  Communication tool and User interface.
+  \newpage
+ \begin{figure}[ht!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{HLD image.png}
+    \caption{HLD for control automation}
+    \label{HLD:Control automation}
+\end{figure}
+Figure \ref{HLD:Control automation} shows the various unit components that are required for the project and how they interact. The project design is a multi-platform
+project. Multi-platform design was selected due to its real-world application resemblance. 
  \subsection{LLD (Low level design)}
+ The low level design shows the structure and make-up of individual units. The LLD is platform divided, units generated or developed in the same platform are part of the same LLD design.\\
+ \textbf{TO BE UPDATED DURING DEVELOPMENT!!!!!!}
 
-\section{Methodology}
+
+\section{High level technical requirements}
+This section is a high level explaination of the main tools or services that are required to achieve the project objectives. The methods sections does not contain pseudo code or any technical
+indicators. The section is intended to be used by individuals who have knowledge of the systems, technologies or concepts used for the project. If any clarification is required, the
+author should be contacted.
+
+\subsection{Fast API}
+\subsubsection{Supabase Data integration}
+To imitate real world third party tools, Supabase is used as a third party data storage. The Supabase
+database will contain synthetic data that resembles customer transactions that have anomalies that indicate 
+fraudulent/suspicious transactions.
+\begin{itemize}
+    \item Create an AI agent that generates synthetic data. The data generated should contain anomalies that indicate fraudulent/suspicious activities.
+    \begin{itemize}
+        \item The synthetic data should customer reference information and transactions
+        \item The Agent must provide definitions about what is an anomaly or fraud based on the generated data.
+        \item The Agent must mention the records that considered an anomaly or fraud.
+        \item \textbf{IMPORTANT}: The agent must respond in JSON.
+    \end{itemize}
+    \item Create a supabase project and retrieve the database API.
+    \item Create four SQL table in supabase.
+    \begin{itemize}
+        \item The first table must contain information about what is anomaly, suspicious or Fraud.
+        \item The second table must contain the synthetic data and an additional boolean field called 'user\_feedback\_received' cdefault value false. 
+        Ensure that the API can be used to change the feedback field status.
+        \item The third table must contain records that show anomaly.
+        \item The fourth table must contain that explaination of why the records were considered an anomaly.
+    \end{itemize}
+    \item Create a FAST API that transfers A.I generated data to the supabase table.
+    \item \textbf{IMPORTANT}: The schema of the tables will be inherited from the inherited synthetic data.
+\end{itemize}
+\subsubsection{Azure Data Factory transfer}
+Azure data factory (ADF) is a tool used to transfer and transform data from one source to another. In this project it  is used to call the Fast API 
+linked to the Supabase database. ADF adheres to the medallion architecture, which consists of three layers Bronze, Silve and Gold. Bronze is associated
+with raw unchanged data, Silver is enhanced or enriched data (e.g., changing date formats and field naming convention) and Gold is a ready to consume layer that
+has business logic imposed.
+\begin{itemize}
+    \item Create a pipeline that copies the information from Supabase to a Azure blob storage that has hierarchical features (datalake).
+    \item Create a pipeline that run databricks notebooks when a new file inserted to the Azure blob storage (Datalake) - \textbf{The step is dependent on databricks notebooks, complete the step when the books have been created}.
+\end{itemize}
+\subsubsection{User interface interaction}
+The user interface has two integrated interfaces. The first will be a Gradio chatbot interface that sends queries to a AI agent. The AI agent
+will query all available resources to provide feedback to a user or admit if it does not have the information requested. The second interface is react
+programmed interface. The interface processes commands from the user based on available functionalities. 
+\begin{itemize}
+    \item Create an A.I agent that queries various tools (e.g., data sources) and provides feedback in natural language.
+    \item Create an interface for user query the A.I agent.
+    \item Create a frontend that contains a chatbot interface and a page to manage the information on the postgres table (working paper).
+\end{itemize}
+
+\subsection{Databricks}
+Databricks is a apache spark platform used to perform analytics and data science tasks using big data. In this project it used to
+create notebooks that will run predefined logic written in SQL. Thereafter, store the results in two databases, Postgres SQL table and 
+an account storage container (Set up as an externally managed table).
+\begin{itemize}
+    \item  Create a databricks container. 
+    \item  Create a databricks connector and assign it contributor privileges.
+    \item  Create three container called bronze, silver and gold.
+    \item  Extract the data from the landing storage to the raw container (adhere to ingestion audit best practices)
+    \item  Ingest the data into the silver container making neccessary changes in preparation for consumption.
+    \item  Run predefined logic and store the results in a silver container table.
+    \item  Perform standard aggregation or summary on the predefined logic output information.
+    \item  Push the standard aggregation or summary to a gold container and postgres table.
+\end{itemize}
+
+\subsection{AI agent and machine learning model}
+AI agent will query information based on the users request using a chatbot interface. Machine learning inference models are 
+going to be functionalised for the agent to call if needed. The AI design pattern (workflow) used is Routing. Routing is a design pattern where an LLM decides 
+which child LLM or process is executed. There is no aggregation or synthesis used for the final outcome.
+\begin{itemize}
+    \item Create an $N$ number of agents and one parent Agent where $N = 1,2,3...$.
+    \item Functionalise child agents to be used as tools for the Parent agent.
+    \item One of the child agents must call the postgres database using API (dveloped using Fast API).
+    \item Functionalise an API call to the ML model inference. 
+    \item Each agent should have guardrails.
+\end{itemize}
+
+ \subsection{Special considerations}
+ \subsubsection{Deployment approach}
+ The project has locally developed features that are packaged using Docker images. These docker images are deployed on docker hub and Azure container registry. Docker hub will be used
+ to store \textbf{development} images and Azure container registy stores production images. There are 3 environments in this project, Production, Development and Test environment. Each environment
+ will have its own database instances, their structure is replicated for the other environment. Semantic versioning will be used to track software versioning. Docker ensures the behavoiur and packages
+ used during development remain consistent during production deployment.
+\subsubsection{Security approach}
+Local development uses the .env file to store confidential or secretive information such passwords and API keys. The \textbf{.env} file is excluded from git tracking and docker hub deployment
+using gitignore and dockerignore.
+\subsubsection{Collaborative development package management}
+To minimize module and library conflicting versions during development a virtual environment is created to ensure consisted version compatibility across different machines.
+\section{Test results}
 \section{Discussion}
 \section{Conclusion}
 \section{Appendix}
