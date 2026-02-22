@@ -1,3 +1,5 @@
+# Testing : Connecting to supabase and retrieving data from the database using FastAPI
+
 
 # Import the required libraries 
 
