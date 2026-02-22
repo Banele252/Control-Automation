@@ -42,10 +42,10 @@ mongo_uri = f"mongodb+srv://{username}:{password}@cluster0.k3rfzyy.mongodb.net/{
 client = AsyncIOMotorClient(mongo_uri)
 db = client[database]
 
-synthetic_collection = db["Synthetic_data"]
-overview_collection = db["Dataset_Overview"]
-dictionary_collection = db["Synthetic_Data"]
-anomaly_collection = db["Anomaly_Key"]
+synthetic_collection = db["synthetic_data"]
+overview_collection = db["dataset_overview"]
+dictionary_collection = db["data_dictionary"]
+anomaly_collection = db["anomaly_key"]
 
 # =========================
 # Agent Call Function
@@ -83,26 +83,20 @@ async def insert_synthetic_data():
 
         # 4️⃣ Insert into MongoDB
         synthetic_insert_result = await synthetic_collection.insert_many(synthetic_records)
-        dictionary_insert_result = await synthetic_collection.insert_many(dictionary_records)
-        overview_insert_result = await synthetic_collection.insert_many(overview_records)
-        anomaly_insert_result = await synthetic_collection.insert_many(anomaly_records)
+        dictionary_insert_result = await dictionary_collection.insert_many(dictionary_records)
+        overview_insert_result = await overview_collection.insert_one(overview_records)
+        anomaly_insert_result = await anomaly_collection.insert_many(anomaly_records)
 
         return {"outcome":[{
-                        "status": "success",
+                        "status": "successs",
                         "records_inserted": len(synthetic_insert_result.inserted_ids)
                     },{
-                    "status": "success",
+                    "status": "successs",
                         "records_inserted": len(dictionary_insert_result.inserted_ids)
-                    },
-                    {
-                    "status": "success",
-                        "records_inserted": len(overview_insert_result.inserted_ids)
-                    },
-                    {
-                    "status": "success",
+                    },{
+                    "status": "successs",
                         "records_inserted": len(anomaly_insert_result.inserted_ids)
                     }
-
                  ]
                 }
 
