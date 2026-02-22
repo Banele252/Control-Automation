@@ -210,11 +210,22 @@ which child LLM or process is executed. There is no aggregation or synthesis use
 Local development uses the .env file to store confidential or secretive information such passwords and API keys. The \textbf{.env} file is excluded from git tracking and docker hub deployment
 using gitignore and dockerignore.
 \subsubsection{Collaborative development package management}
-To minimize module and library conflicting versions during development a virtual environment is created to ensure consisted version compatibility across different machines.
+To minimize module and library conflicting versions during development a virtual environment is created to ensure consisted version compatibility across different machines. 
+
+\subsubsection{code consideration}
+Install packages as modules if they are giving you issues. Use the following notation:\\
+\\
+
+Firstly upgrade pip and then \textbf{\texttt{python -m ensurepip --upgrade}
+\textbf{\texttt{python -m pip install <package name>}}
+\\
 \section{Test results}
 \section{Discussion}
 \section{Conclusion}
 \section{Appendix}
+
+
+
 \subsection{Code}
 
 \end{document}
