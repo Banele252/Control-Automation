@@ -23,7 +23,9 @@
         \hline
         \textbf{Version} & \textbf{Approvers} & \textbf{Approval status} & \textbf{Comments} &\textbf{Date} \\
         \hline
-          1.0.0 & Banele Mdluli & Pending & compiling documentation & February 2026\\
+          1.0.0 & Banele Mdluli & Pending & compiling documentation & 02 February 2026\\
+        \hline
+          1.1.0 & Banele Mdluli & Pending & Replaced Supbase with Mongo DB & 23 February 2026\\
         \hline
     \end{tabular}
     
@@ -130,8 +132,8 @@ indicators. The section is intended to be used by individuals who have knowledge
 author should be contacted.
 
 \subsection{Fast API}
-\subsubsection{Supabase Data integration}
-To imitate real world third party tools, Supabase is used as a third party data storage. The Supabase
+\subsubsection{Mongo DB Data integration}
+To imitate real world third party tools, Mongo DB is used as a third party data storage. The Mongo DB
 database will contain synthetic data that resembles customer transactions that have anomalies that indicate 
 fraudulent/suspicious transactions.
 \begin{itemize}
@@ -142,8 +144,8 @@ fraudulent/suspicious transactions.
         \item The Agent must mention the records that considered an anomaly or fraud.
         \item \textbf{IMPORTANT}: The agent must respond in JSON.
     \end{itemize}
-    \item Create a supabase project and retrieve the database API.
-    \item Create four SQL table in supabase.
+    \item Create a Mongo DB project and retrieve the database API.
+    \item Create four collections in Mongo DB.
     \begin{itemize}
         \item The first table must contain information about what is anomaly, suspicious or Fraud.
         \item The second table must contain the synthetic data and an additional boolean field called 'user\_feedback\_received' cdefault value false. 
@@ -151,7 +153,7 @@ fraudulent/suspicious transactions.
         \item The third table must contain records that show anomaly.
         \item The fourth table must contain that explaination of why the records were considered an anomaly.
     \end{itemize}
-    \item Create a FAST API that transfers A.I generated data to the supabase table.
+    \item Create a FAST API that transfers A.I generated data to the Mongo DB table.
     \item \textbf{IMPORTANT}: The schema of the tables will be inherited from the inherited synthetic data.
 \end{itemize}
 \subsubsection{Azure Data Factory transfer}
@@ -216,7 +218,7 @@ To minimize module and library conflicting versions during development a virtual
 Install packages as modules if they are giving you issues. Use the following notation:\\
 \\
 
-Firstly upgrade pip and then \textbf{\texttt{python -m ensurepip --upgrade}
+Firstly upgrade pip and then \textbf{\texttt{python -m ensurepip --upgrade}}
 \textbf{\texttt{python -m pip install <package name>}}
 \\
 \section{Test results}
