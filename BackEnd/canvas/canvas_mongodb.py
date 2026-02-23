@@ -2,7 +2,7 @@
 
 # import libraries and connect mongodb
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException,Path,Query
 from dotenv import load_dotenv
 import os
 from starlette import status
@@ -191,5 +191,26 @@ async def get_anomaly_data():
             status_code=400,
             detail=f"Error encountered during data retrieval: {str(e)}"
         )
+@app.put("/update_record/{account_no}")
+async def update_data_record(account_no:str= Path(description="account number of the user")):
+    filter = {"Account Number":account_no}
+    update ={"$set":{"Review":True}}
+    try:
+        result = await synthetic_collection.update_one(filter, update)
+
+        if result.matched_count == 0:
+            raise HTTPException(
+                status_code = 404,
+                detail='No record found with the given account number'
+            )
+        return {"status":"success",
+            "Document Matched":f"{result.matched_count}",
+            "Document Modified": f"{result.modified_count}"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Error during update: {str(e)}"
+        )
+    
 
 
