@@ -18,6 +18,7 @@ class agent_info():
     Every dataset must include at minimum:
     - **User Reference Fields**: User ID, Account Number, Name, Email, Phone, Registration Date, Location
     - **Usage Fields**: Transaction/Activity ID, Timestamp, Amount/Quantity, Type/Category, Status
+    - **Review Field**: Review(Boolean: False [Default value])
     - **Contextual Fields**: Industry-specific attributes relevant to detecting anomalies
 
     ### 3. Types of Anomalies to Generate
