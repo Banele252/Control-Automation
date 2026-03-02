@@ -116,10 +116,7 @@ async def get_synthetic_data():
             doc["_id"] = str(doc["_id"])
             records.append(doc)
 
-        return {
-            "status": "success",
-            "data": records
-        }
+        return records
 
     except Exception as e:
         raise HTTPException(
@@ -137,11 +134,8 @@ async def get_overview():
             doc["_id"] = str(doc["_id"])
             records.append(doc)
 
-        return {
-            "status": "success",
-            "data": records
-        }
-
+        return records
+    
     except Exception as e:
         raise HTTPException(
             status_code=400,
@@ -160,10 +154,7 @@ async def get_data_dictionary():
             doc["_id"] = str(doc["_id"])
             records.append(doc)
 
-        return {
-            "status": "success",
-            "data": records
-        }
+        return records
 
     except Exception as e:
         raise HTTPException(
@@ -181,10 +172,7 @@ async def get_anomaly_data():
             doc["_id"] = str(doc["_id"])
             records.append(doc)
 
-        return {
-            "status": "success",
-            "data": records
-        }
+        return records
 
     except Exception as e:
         raise HTTPException(
