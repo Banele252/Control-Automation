@@ -211,3 +211,6 @@ memory.db
 # Exclude everything in canvas
 BackEnd/canvas/
 
+
+#
+Documents/.$*
