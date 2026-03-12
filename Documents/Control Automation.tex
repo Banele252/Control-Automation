@@ -19,11 +19,15 @@
     \vspace{2cm}
     
     % Add a table
-    \begin{tabular}{|r|l|l|l|l|}
+    \begin{tabular}{|r|l|l|p{4cm}|l|}
         \hline
         \textbf{Version} & \textbf{Approvers} & \textbf{Approval status} & \textbf{Comments} &\textbf{Date} \\
         \hline
-          1.0.0 & Banele Mdluli & Pending & compiling documentation & February 2026\\
+          1.0.0 & Banele Mdluli & Pending & compiling documentation & 02 February 2026\\
+        \hline
+          2.0.0 & Banele Mdluli & Approved & Replaced Supbase with Mongo DB & 23 February 2026\\
+        \hline
+          2.1.0 & Banele Mdluli & Approved & Added agent control performance summary & 5 March 2026\\
         \hline
     \end{tabular}
     
@@ -130,8 +134,8 @@ indicators. The section is intended to be used by individuals who have knowledge
 author should be contacted.
 
 \subsection{Fast API}
-\subsubsection{Supabase Data integration}
-To imitate real world third party tools, Supabase is used as a third party data storage. The Supabase
+\subsubsection{Mongo DB Data integration}
+To imitate real world third party tools, Mongo DB is used as a third party data storage. The Mongo DB
 database will contain synthetic data that resembles customer transactions that have anomalies that indicate 
 fraudulent/suspicious transactions.
 \begin{itemize}
@@ -142,8 +146,8 @@ fraudulent/suspicious transactions.
         \item The Agent must mention the records that considered an anomaly or fraud.
         \item \textbf{IMPORTANT}: The agent must respond in JSON.
     \end{itemize}
-    \item Create a supabase project and retrieve the database API.
-    \item Create four SQL table in supabase.
+    \item Create a Mongo DB project and retrieve the database API.
+    \item Create four collections in Mongo DB.
     \begin{itemize}
         \item The first table must contain information about what is anomaly, suspicious or Fraud.
         \item The second table must contain the synthetic data and an additional boolean field called 'user\_feedback\_received' cdefault value false. 
@@ -151,16 +155,17 @@ fraudulent/suspicious transactions.
         \item The third table must contain records that show anomaly.
         \item The fourth table must contain that explaination of why the records were considered an anomaly.
     \end{itemize}
-    \item Create a FAST API that transfers A.I generated data to the supabase table.
+    \item Create a FAST API that transfers A.I generated data to the Mongo DB table.
     \item \textbf{IMPORTANT}: The schema of the tables will be inherited from the inherited synthetic data.
 \end{itemize}
 \subsubsection{Azure Data Factory transfer}
 Azure data factory (ADF) is a tool used to transfer and transform data from one source to another. In this project it  is used to call the Fast API 
-linked to the Supabase database. ADF adheres to the medallion architecture, which consists of three layers Bronze, Silve and Gold. Bronze is associated
+linked to the Mongo database. ADF adheres to the medallion architecture, which consists of three layers Bronze, Silve and Gold. Bronze is associated
 with raw unchanged data, Silver is enhanced or enriched data (e.g., changing date formats and field naming convention) and Gold is a ready to consume layer that
 has business logic imposed.
 \begin{itemize}
-    \item Create a pipeline that copies the information from Supabase to a Azure blob storage that has hierarchical features (datalake).
+    \item Create a pipeline that copies the information from Mongo database to a Azure blob storage.
+    \item Move the data from the Azure blob storage to a Azure datalake storage Gen2 that has hierarchical features .
     \item Create a pipeline that run databricks notebooks when a new file inserted to the Azure blob storage (Datalake) - \textbf{The step is dependent on databricks notebooks, complete the step when the books have been created}.
 \end{itemize}
 \subsubsection{User interface interaction}
@@ -184,20 +189,49 @@ an account storage container (Set up as an externally managed table).
     \item  Extract the data from the landing storage to the raw container (adhere to ingestion audit best practices)
     \item  Ingest the data into the silver container making neccessary changes in preparation for consumption.
     \item  Run predefined logic and store the results in a silver container table.
-    \item  Perform standard aggregation or summary on the predefined logic output information.
-    \item  Push the standard aggregation or summary to a gold container and postgres table.
+    \item  Push the silver container table (control performance outcome) to a postgres table
 \end{itemize}
 
 \subsection{AI agent and machine learning model}
+There are two use cases that will require A.I agents. The first use case is about an A.I agent that creates a summary 
+based on control performance outcome. The second use case is about an A.I agent that handles user interaction in the platform and provides 
+the desired outcome.\\
+\subsubsection{Use case 1: Control performance summary agent}
+The agent will extract a control daily exception outcomes. There after perform a summary based on a list of requirements. Not all requirement can
+be fulfilled for every control. However, they will be mandatory and optional requirements. The control summary will be divided into two levels, namely,
+first and second summary. The first level is compulsory for every control and the second level will depend on the type of control.  
+\begin{itemize}
+    \item Create an agent that will review control outcome exceptions and provide a first level summary.
+    \item The summary should contain the following:
+    \begin{itemize}
+        \item Compulsory summary should have the following: 
+        \begin{itemize}
+            \item The number of records.
+            \item The total usage.
+            \item The total spend. 
+        \end{itemize}
+        \item Optional summary (in addition to compulsory):
+        \begin{itemize}
+            \item Top five accounts based on usage, spend and record frequency.
+            \item Five accounts that have appeared in two previous days reviews.
+            \item Trend explaination since the start of the month (are the number exceptions increasing per day, the month to date trend).
+        \end{itemize}
+    \end{itemize}
+    \item Store the review outcome in another postgres table called daily control outcome review.
+\end{itemize}
+
+\subsubsection{Use case 2: User interaction agent}
 AI agent will query information based on the users request using a chatbot interface. Machine learning inference models are 
-going to be functionalised for the agent to call if needed. The AI design pattern (workflow) used is Routing. Routing is a design pattern where an LLM decides 
-which child LLM or process is executed. There is no aggregation or synthesis used for the final outcome.
+going to be functionalised for the agent to call if needed. The AI design pattern (workflow) used is Routing. Routing is a design pattern 
+where an LLM decides. which child LLM or process is executed. There is no aggregation or synthesis used for the final outcome.
+
 \begin{itemize}
     \item Create an $N$ number of agents and one parent Agent where $N = 1,2,3...$.
     \item Functionalise child agents to be used as tools for the Parent agent.
-    \item One of the child agents must call the postgres database using API (dveloped using Fast API).
+    \item One of the child agents must call the postgres database using API (developed using Fast API).
     \item Functionalise an API call to the ML model inference. 
     \item Each agent should have guardrails.
+    \item Process the users inputs and provide the best outcome based on the information available.
 \end{itemize}
 
  \subsection{Special considerations}
@@ -216,7 +250,7 @@ To minimize module and library conflicting versions during development a virtual
 Install packages as modules if they are giving you issues. Use the following notation:\\
 \\
 
-Firstly upgrade pip and then \textbf{\texttt{python -m ensurepip --upgrade}
+Firstly upgrade pip and then \textbf{\texttt{python -m ensurepip --upgrade}}
 \textbf{\texttt{python -m pip install <package name>}}
 \\
 \section{Test results}

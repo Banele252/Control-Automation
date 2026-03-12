@@ -202,3 +202,15 @@ memory.db
 # exclude drawio
 *.drawio
 *.drawio.bkp
+*.dtmp
+.$HLD*
+*.drawio.dtmp
+.$HLD (High level Design).drawio_1.dtmp
+.$HLD (High level Design).drawio.dtmp
+
+# Exclude everything in canvas
+BackEnd/canvas/
+
+
+#
+Documents/.$*
