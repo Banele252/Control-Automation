@@ -1,0 +1,67 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{geometry}
+\geometry{margin=3cm}
+
+\title{Control automation: Data engineering requirements}
+\author{Author: Banele Mdluli}
+\date{March 2026}
+
+\begin{document}
+
+\maketitle
+\newpage
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    
+    {\Huge\bfseries Version tracking\par}
+    \vspace{2cm}
+    
+    % Add a table
+    \begin{tabular}{|r|l|l|p{4cm}|l|}
+        \hline
+        \textbf{Version} & \textbf{Approvers} & \textbf{Approval status} & \textbf{Comments} &\textbf{Date} \\
+        \hline
+          1.0.0 & Banele Mdluli & Not required & compiling documentation & 12 March 2026\\
+        \hline
+    \end{tabular}
+    
+    \vfill
+    
+\end{titlepage}
+\newpage
+
+\section{Summary}
+The project uses medallion architecture for data ingestion, processing and curation(consumption). The document will
+contain a list of requirements for each layer of the architecture. The medallion architecture contains three layers
+bronze, silver and gold. Bronze layer operations consist of pulling the data as is from an external storage source.
+Silver layer operations are processes or methods used to convert the data formats to required formats. Additionally, 
+enhance the data with audit fields and remove redundant fields. Gold layer operations are processess used to 
+get the data ready for consumption by end-user or downstream systems.
+
+\section{Data engineering requirements}
+The requirements per each layer will apply to each table in that layer. Unless there are technical limitation that 
+require additional or fewer requirements to be implemented.
+\subsection{Raw layer requirements}
+\begin{itemize}
+    \item Copy the data AS-IS from the external source.
+    \item (IF required) make changes that will enable the data to be save as delta tables
+    \item Each table must stored in a catalog called raw\_control\_datalake.
+    \item The table names must match the same names extracted from the external source.
+    \item Include an ingestion datetime.
+\end{itemize}
+\subsection{Silver layer engineering requirements}
+\begin{itemize}
+    \item Extract the data from raw\_control\_datalake.
+    \item Remove the \_id field and ingestion datetime field.
+    \item Convert fields to become python friendly (USE snake format).
+    \item Add ingestion datetime and modified datetime.
+\end{itemize}
+\subsection{Gold layer engineering requirements}
+\begin{itemize}
+    \item If a new table is created, then it should adhere silver layer requirements.
+    \item If a table does not have primary key field, create a primary key that adheres to the rules.
+\end{itemize}
+
+\end{document}
