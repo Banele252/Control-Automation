@@ -48,7 +48,6 @@ def connection_instant():
 # control_exception
 @app.get("/data/{table}")
 async def get_data(table:str):
-
     try:
         conn=connection_instant() #creates a database instant.
         cursor = conn.cursor() #enables to execute queries.
