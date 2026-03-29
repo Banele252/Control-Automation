@@ -3,12 +3,13 @@
 
 # Import the required libraries.
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import os
 from dotenv import load_dotenv
 import psycopg2
 from pydantic import BaseModel
 from typing import List, Dict
+from starlette import status
 
 # Provide a brief description of the task
 
@@ -46,7 +47,7 @@ def connection_instant():
 
 #get data from  synthetic_data, control_dictionary, control_logic, 
 # control_exception
-@app.get("/data/{table}")
+@app.get("/data/{table}",status_code=status.HTTP_200_OK) #table can be synthetic_data, control_dictionary, control_logic, control_exception
 async def get_data(table:str):
     try:
         conn=connection_instant() #creates a database instant.
@@ -59,20 +60,16 @@ async def get_data(table:str):
         columns = [desc[0] for desc in cursor.description]
         data = [dict(zip(columns, row)) for row in rows]
         response = data
+        cursor.close()
+        conn.close()
+        return response
     except Exception as e:
-        response = {"details": f"Error: {str(e)}"}
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except:
-            pass
-    return response
+        raise HTTPException(status_code=404, detail=str(e))
 
 #push data from synthetic_data, control_dictionary, control_logic
 
 
-@app.post("/insert/{table}") #very important: extracting column dynamically requires
+@app.post("/insert/{table}", status_code=status.HTTP_201_CREATED) #very important: extracting column dynamically requires
 #the order to be the same from the source to the target input.
 async def insert_many(table: str, rows: List[Dict]):
     if not rows:
@@ -110,11 +107,11 @@ async def insert_many(table: str, rows: List[Dict]):
 
         cursor.execute(query, flat_values)
         conn.commit()
-
+        cursor.close()
+        conn.close()
         return {"status": "success", "inserted": len(rows)}
-
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=400,detail=str(e))
 
     finally:
         try:
