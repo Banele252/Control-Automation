@@ -209,7 +209,7 @@ memory.db
 .$HLD (High level Design).drawio.dtmp
 
 # Exclude everything in canvas
-BackEnd/canvas/
+# BackEnd/canvas/
 
 
 #
