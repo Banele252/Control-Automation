@@ -3,13 +3,16 @@
 
 # Import the required libraries.
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 import os
 from dotenv import load_dotenv
 import psycopg2
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Annotated
+from sqlalchemy.orm import Session
 from starlette import status
+from supabase_databases import SessionLocal
+from supabase_mapping import table_mapping # this is used to get details of the ORL model
 
 # Provide a brief description of the task
 
@@ -21,6 +24,15 @@ This is a wrapper Fast API to call supabase API and retrieve the stored in that 
 
 """
 app = FastAPI()
+
+def get_db(): # Creates a DB session 
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+db_dependency = Annotated[Session, Depends(get_db)]
 
 load_dotenv(override=True)
 #Load the necessary keys
@@ -45,16 +57,32 @@ def connection_instant():
     return conn
 
 
+####
 #get data from  synthetic_data, control_dictionary, control_logic, 
 # control_exception
+@app.get("/data/{table}",status_code=status.HTTP_200_OK) #table can be synthetic_data, control_dictionary, control_logic, control_exception
+async def get_data(db:db_dependency ,table:str):
+    try:
+        return db.query(table_mapping.get_orm_model(table)).all()
+    except Exception as e:
+        raise HTTPException(
+                    status_code=404, 
+                    detail=str(e))
+
+#push data from synthetic_data, control_dictionary, control_logic
+
+####
+#get data from  synthetic_data, control_dictionary, control_logic, 
+# control_exception
+'''
 @app.get("/data/{table}",status_code=status.HTTP_200_OK) #table can be synthetic_data, control_dictionary, control_logic, control_exception
 async def get_data(table:str):
     try:
         conn=connection_instant() #creates a database instant.
         cursor = conn.cursor() #enables to execute queries.
         query = f"""
-                 SELECT * FROM {SUPABASE_SCHEMA}.{table}
-                ;"""
+                 SELECT * FROM %s.%s
+                ;""",(SUPABASE_SCHEMA,table)
         cursor.execute(query)
         rows = cursor.fetchall()
         columns = [desc[0] for desc in cursor.description]
@@ -64,7 +92,7 @@ async def get_data(table:str):
         conn.close()
         return response
     except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))'''
 
 #push data from synthetic_data, control_dictionary, control_logic
 
