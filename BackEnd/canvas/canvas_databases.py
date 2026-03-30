@@ -30,6 +30,6 @@ url = URL.create(
 
 engine = create_engine(url, connect_args={"sslmode":"require"})
 
-SessionLocal =  sessionmaker(autoflush=False, autoflush=False, bind=engine)
+SessionLocal =  sessionmaker(autoflush=False, autocommit=False, bind=engine)
 
 Base = declarative_base()
