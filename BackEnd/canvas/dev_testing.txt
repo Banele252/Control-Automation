@@ -1,0 +1,25 @@
+Tested the Supabase post request for the ingestion API, and it worked. Here 
+is the payload that was used.
+[
+    {
+        "reference_number": 1,
+        "control_logic": "CHK_BAL_GT_ZERO",
+        "control_logic_description": "Checks whether account balance is greater than zero.",
+        "control_logic_status": "ACTIVE",
+        "created_timestamp": "2025-01-01 10:00:00"
+    },
+    {
+        "reference_number": 2,
+        "control_logic": "CHK_DOB_VALID",
+        "control_logic_description": "Ensures date of birth is not in the future.",
+        "control_logic_status": "ACTIVE",
+        "created_timestamp": "2025-01-01 10:00:00"
+    },
+    {
+        "reference_number": 3,
+        "control_logic": "CHK_EMAIL_FORMAT",
+        "control_logic_description": "Validates whether email format conforms to RFC standards.",
+        "control_logic_status": "INACTIVE",
+        "created_timestamp": "2025-01-01 10:00:00"
+    }
+] 
