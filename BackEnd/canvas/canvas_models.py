@@ -1,7 +1,10 @@
-from canvas_databases import Base
+from canvas_databases import Base, engine
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, FLOAT,TIMESTAMP
 from dotenv import load_dotenv
 import os
+
+load_dotenv(override=True)
+
 # A user can use this script to create a new table without needing configure it on supabase
 SUPABASE_SCHEMA = os.getenv("SUPABASE_SCHEMA")
 
@@ -60,17 +63,3 @@ class ControlException(Base):
     detection_time = Column(TIMESTAMP, nullable=False)
 
 
-class test(Base):
-    __tablename__= "control_test"
-    __table_args__ = {"schema":SUPABASE_SCHEMA}
-
-    account_number = Column(String, nullable=False,primary_key=True)
-    email = Column(String)
-    name= Column(String)
-    phone = Column(String)
-    registration_date = Column(String)
-    status = Column(String)
-    timestamp = Column(String)
-    usage_amount = Column(FLOAT)
-    user_id = Column(String)
-    detection_time = Column(TIMESTAMP, nullable=False)
