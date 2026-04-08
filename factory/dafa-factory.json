@@ -1,0 +1,9 @@
+{
+	"name": "dafa-factory",
+	"location": "southafricanorth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "50f065f1-a3ac-498a-8a8f-17c96aa48b96",
+		"tenantId": "6d72e5bf-1900-4fde-9e38-2e2059995628"
+	}
+}

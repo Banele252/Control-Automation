@@ -1,0 +1,39 @@
+{
+	"name": "ds_mongodb_httpslist_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_landing_sa",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "raw data source"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "mongodb_source_list.json",
+				"container": "raw"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"sourceName": {
+					"type": "string"
+				},
+				"sourceEnvironment": {
+					"type": "string"
+				},
+				"sourceBaseURL": {
+					"type": "string"
+				},
+				"sourceRelativeURL": {
+					"type": "string"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

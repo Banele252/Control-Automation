@@ -1,0 +1,84 @@
+{
+	"name": "ds_mongodb_https",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_mongo_db",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"BaseURL": {
+					"value": "@dataset().sourceBaseURL",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"sourceRelativeURL": {
+				"type": "string"
+			},
+			"sourceBaseURL": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "raw data source"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@dataset().sourceRelativeURL",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"status": {
+					"type": "string"
+				},
+				"data": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"_id": {
+								"type": "string"
+							},
+							"User ID": {
+								"type": "string"
+							},
+							"Account Number": {
+								"type": "string"
+							},
+							"Name": {
+								"type": "string"
+							},
+							"Email": {
+								"type": "string"
+							},
+							"Phone": {
+								"type": "string"
+							},
+							"Registration Date": {
+								"type": "string"
+							},
+							"Usage Amount": {
+								"type": "number"
+							},
+							"Transaction Timestamp": {
+								"type": "string"
+							},
+							"Status": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

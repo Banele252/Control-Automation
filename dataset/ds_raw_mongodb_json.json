@@ -1,0 +1,32 @@
+{
+	"name": "ds_raw_mongodb_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_landing_dl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sinkFileName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "raw data source"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().sinkFileName",
+					"type": "Expression"
+				},
+				"folderPath": "landing",
+				"fileSystem": "raw"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

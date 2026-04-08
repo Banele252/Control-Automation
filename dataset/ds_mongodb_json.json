@@ -1,0 +1,76 @@
+{
+	"name": "ds_mongodb_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_landing_sa",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"fileName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "raw data source"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().fileName",
+					"type": "Expression"
+				},
+				"container": "raw"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"status": {
+					"type": "string"
+				},
+				"data": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"_id": {
+								"type": "string"
+							},
+							"User ID": {
+								"type": "string"
+							},
+							"Account Number": {
+								"type": "string"
+							},
+							"Name": {
+								"type": "string"
+							},
+							"Email": {
+								"type": "string"
+							},
+							"Phone": {
+								"type": "string"
+							},
+							"Registration Date": {
+								"type": "string"
+							},
+							"Usage Amount": {
+								"type": "number"
+							},
+							"Transaction Timestamp": {
+								"type": "string"
+							},
+							"Status": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
