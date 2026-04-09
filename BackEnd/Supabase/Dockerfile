@@ -10,6 +10,8 @@ RUN pip install --no-cache  -r requirements.txt
 
 COPY . /app/
 
-RUN python python supbase_create_tables.py
+ENTRYPOINT ["/app/entrypoint.sh"]
 
-CMD ["uvicorn", "main:app", "--host","0.0.0.0","--port","8000"]
+RUN chmod +x /app/entrypoint.sh
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
