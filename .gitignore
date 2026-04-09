@@ -1,6 +1,7 @@
 .venv
 .env
 psy
+venv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -209,7 +210,7 @@ memory.db
 .$HLD (High level Design).drawio.dtmp
 
 # Exclude everything in canvas
-BackEnd/canvas/
+# BackEnd/canvas/
 
 
 #

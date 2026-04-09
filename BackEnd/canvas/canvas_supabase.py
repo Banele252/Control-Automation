@@ -11,8 +11,9 @@ from pydantic import BaseModel
 from typing import List, Dict, Annotated
 from sqlalchemy.orm import Session
 from starlette import status
-from supabase_databases import SessionLocal
-from supabase_mapping import table_mapping # this is used to get details of the ORL model
+from canvas_databases import SessionLocal
+from canvas_models import SyntheticData
+from canvas_mapping import table_mapping # this is used to get details of the ORL model
 
 # Provide a brief description of the task
 
