@@ -1,0 +1,31 @@
+[
+    {
+        "sourceName":"MongoDB",
+        "sourceEnvironment":"prod",
+        "sourceBaseURL":"https://controlweb-fzexaee5chefcubm.southafricanorth-01.azurewebsites.net",
+        "sourceRelativeURL" :"get_synthetic_data",
+        "fileName":"synthetic_data.json"
+    },
+       {
+        "sourceName":"MongoDB",
+        "sourceEnvironment":"prod",
+        "sourceBaseURL":"https://controlweb-fzexaee5chefcubm.southafricanorth-01.azurewebsites.net",
+        "sourceRelativeURL" :"get_overview",
+        "fileName":"data_overview.json"
+    },
+       {
+        "sourceName":"MongoDB",
+        "sourceEnvironment":"prod",
+        "sourceBaseURL":"https://controlweb-fzexaee5chefcubm.southafricanorth-01.azurewebsites.net",
+        "sourceRelativeURL" :"get_dictionary",
+        "fileName":"data_dictionary.json"
+    },
+       {
+        "sourceName":"MongoDB",
+        "sourceEnvironment":"prod",
+        "sourceBaseURL":"https://controlweb-fzexaee5chefcubm.southafricanorth-01.azurewebsites.net",
+        "sourceRelativeURL" :"get_anomaly",
+        "fileName":"data_anomaly.json"
+    }
+
+]
