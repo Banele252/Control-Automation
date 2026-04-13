@@ -1,0 +1,82 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Interactive agent: control automation}
+\author{Banele Mdluli}
+\date{April 2026}
+
+\begin{document}
+\maketitle
+\newpage
+\section{Introduction}
+The section contains low-level requirements for interactive and control summary agents. The interactive agent is used to answer complex queries from a user. The control summary agent will be used to complete an in-depth analysis of the control exceptions. 
+
+\section{Low-level requirements}
+\subsection{Interactive agents}
+The architecture or workflow that will be used for the section is the evaluator-optimiser flow. The framework for developing the agents will be the OpenAI Agent SDK. The following are low-level requirements for the interactive agent.
+\begin{enumerate}
+    \item Create an agent that will serve as an assistant to a user who is querying about control performance information. 
+    \item The assistant agent must consist of 3 agents. The following are the roles of each:
+    \begin{enumerate}
+        \item The request recipient agent should rewrite the query and add relevent context where applicable for the processing agent.
+        \item The processing agent should analyse the request and call available API tools to compile an appropriate response.
+        \item The evaluator agent should review if the response is adequate to share with user, and it has fulfilled the list of key requirements when providing a response. If the evaluator agent is satisfied with the response, the processing agent should return it to the user.
+    \end{enumerate}
+    \item The functional and non-functional requirements of the request recipient agent.
+    \begin{enumerate}
+        \item The agent should use RAG to collect relevant context for a query. The RAG method used must leverage LangChain libraries.
+        \item The agent chunk performance should be subjected to precision@k, recall@k, and Mean reciprocal rank (MRR) thresholds.
+        \item The agent should complete processing the request in less than 20 seconds.
+    \end{enumerate}
+    \item The functional and non-functional requirements of the processing agent.
+    \begin{enumerate}
+        \item If applicable, the agent must call APIs using the tool feature. To compile a response for the user.
+        \item The agent's response to the user should be streamed.
+        \item The agent's response should take less than 10 seconds.
+        \item The agent is only allowed 2 attempts to create an adequate response; it should inform the user that it does not have relevant information to the question.
+    \end{enumerate}
+    \item The functional and non-functional requirements of the evaluator agent.
+    \begin{enumerate}
+        \item The agent should review the compiled feedback and determine if it is adequate to provide to the user.
+        \item If the response is adequate, the reasons for approving the feedback should be recorded in the logs.
+    \end{enumerate}
+
+The token usage per agent for every query will be recorded to track overuse or underuse. User-agent interaction should be recorded for future reviews. 
+\end{enumerate}
+
+\subsection{Control summary agent}
+The architecture or workflow that will be used for the section is the evaluator-optimiser flow. The framework for developing the agents will be the OpenAI Agent SDK. The following are low-level requirements for the control summary agent.
+
+\begin{enumerate}
+    \item Create an agent that will serve as an assistant to compile control performance summaries.
+    \item The assistant agent must consist of 3 agents. The following are the roles of each:
+    \begin{enumerate}
+        \item The control data recipient agent should extract control exception data and retrieve relevant context(e.g., field name descriptions, control name,..) for the processing agent.
+        \item The processing agent should analyse the request and call available API tools to compile an appropriate summary for the control performance.
+        \item The evaluator agent should review if the summary is adequate to record on the control summary table, and it has fulfilled the list of key details when providing a summary. If the evaluator agent is satisfied with the summary, the processing agent should send the response to a summary table.
+    \end{enumerate}
+    \item The functional and non-functional requirements of the request recipient agent.
+    \begin{enumerate}
+        \item The agent should use RAG to collect relevant context for a query. The RAG method used must leverage LangChain libraries.
+        \item The agent chunk performance should be subjected to precision@k, recall@k, and Mean reciprocal rank (MRR) thresholds.
+        \item The agent should complete processing the request in less than 20 seconds.
+    \end{enumerate}
+    \item The functional and non-functional requirements of the processing agent.
+    \begin{enumerate}
+        \item If applicable, the agent must call APIs using the tool feature. To compile a summary for the control response.
+        \item The agent's control summary response should have fewer than 500 characters.
+        \item The agent's summary should take less than 3 minutes.
+        \item The agent should use batch processing to analyse multiple control performance outcomes.
+        \item The agent is only allowed 2 attempts to create an adequate summary; if it does not succeed, then it should send the reasons for inadequate responses.
+    \end{enumerate}
+    \item The functional and non-functional requirements of the evaluator agent.
+    \begin{enumerate}
+        \item The agent should review the compiled feedback and determine whether it is adequate to record on the control summary table or not.
+        \item If the response is adequate, the reasons for approving the feedback should be recorded in the logs.
+    \end{enumerate}
+The token usage per agent for every query will be recorded to track overuse or underuse. User-agent interaction should be recorded for future reviews. 
+\end{enumerate}
+
+
+
+\end{document}
