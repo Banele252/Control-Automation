@@ -12,7 +12,7 @@ from typing import List, Dict, Annotated
 from sqlalchemy.orm import Session
 from starlette import status
 from supabase_databases import SessionLocal
-from supabase_mapping import table_mapping # this is used to get details of the ORL model
+from supabase_mapping import get_orm_model # this is used to get details of the ORL model
 
 # Provide a brief description of the task
 
@@ -61,12 +61,12 @@ def connection_instant():
 #get data from  synthetic_data, control_dictionary, control_logic, 
 # control_exception
 @app.get("/data/{table}",status_code=status.HTTP_200_OK) #table can be synthetic_data, control_dictionary, control_logic, control_exception
-async def get_data(db:db_dependency ,table:str):
+def get_data(db:db_dependency ,table:str):
     try:
-        return db.query(table_mapping.get_orm_model(table)).all()
+        return db.query(get_orm_model(table)).all()
     except Exception as e:
         raise HTTPException(
-                    status_code=404, 
+                    status_code=status.HTTP_400_BAD_REQUEST, 
                     detail=str(e))
 
 #push data from synthetic_data, control_dictionary, control_logic
@@ -99,7 +99,7 @@ async def get_data(table:str):
 
 @app.post("/insert/{table}", status_code=status.HTTP_201_CREATED) #very important: extracting column dynamically requires
 #the order to be the same from the source to the target input.
-async def insert_many(table: str, rows: List[Dict]):
+def insert_many(table: str, rows: List[Dict]):
     if not rows:
         return {"error": "No records provided"}
 

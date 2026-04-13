@@ -62,4 +62,16 @@ class ControlException(Base):
     user_id = Column(String)
     detection_time = Column(TIMESTAMP, nullable=False)
 
+class ControlSummary(Base):
+    __tablename__="control_summary"
+    __table_args__ = {"schema":SUPABASE_SCHEMA}
+    
+    index_number = Column(Integer,nullable=False, primary_key=True)
+    analysis_date = Column(String)
+    control_summary = Column(String)
+    issue_resolution_status = Column(String)
+    feedback_receiving_date = Column(String)
+    outcome=Column(String)
+    day = Column(String)
+
 
