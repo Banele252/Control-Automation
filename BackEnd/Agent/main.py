@@ -13,8 +13,8 @@ from pydantic import BaseModel,Field
 from typing import Optional, List, Dict 
 import requests
 from fastapi import FastAPI, HTTPException, Depends
-import psycopg2
 from starlette import status
+
 #import json
 load_dotenv(override=True)
 
@@ -166,10 +166,21 @@ async def create_summary(input_endpoints:List[Dict], destination_endpoint:str):
     output_dictionary = output_results.model_dump()
 
     URL = BASE_URL+ destination_endpoint
+
+    # It best practice to mix sync and async code
+    #try: 
+    #    requests.post(url=URL,json=[output_dictionary])
+    #    return {"status":"success"}
+    #except Exception as e:
+    #    raise HTTPException(status_code=400, detail=str(e))
+    
+     # implementing the async version
     try:
-        requests.post(url=URL,json=[output_dictionary])
-        return {"status":"success"}
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url=URL, json=[output_dictionary])
+            return{"status":"success"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 
