@@ -32,6 +32,7 @@ SUPABASE_HOST_POOL = os.getenv("SUPABASE_HOST_POOL")
 SUPABASE_DB_USER = os.getenv("SUPABASE_DB_USER")
 SUPABASE_DB_PASSWORD = os.getenv("SUPABASE_DB_PASSWORD")
 SUPABASE_SCHEMA = os.getenv("SUPABASE_SCHEMA")
+SUPABASE_CONTAINER = os.getenv("SUPABASE_CONTAINER")
 
 
 # Connecting to the database using the raw table information 
@@ -67,10 +68,22 @@ openai_model = "gpt-4o-mini"
 
 
 ALL_ENDPOINTS = ["/data/exception", "/data/logic", "/data/dictionary"] #this needs to be  shared using an API.
-BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net"
+
+#[{"exception":"/data/exception"}, {"logic":"/data/logic"}, {"dict":"/data/dictionary"}] 
+#using internal docker container communication
+
+BASE_URL = f"http://{SUPABASE_CONTAINER}:8000" #limitation the host machine needs to use 8001 port for supabase communication.
+
+#using the azure app deployed api 
+#BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net"
 
 async def _fetch_one(client: httpx.AsyncClient, endpoint: str) -> tuple[str, Any]:
-    BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net" #Later the API should be passed using environment variables (easier change from dev to test or prod environment)
+    
+    # using internal docker container communication
+    #BASE_URL = f"http://{SUPABASE_CONTAINER}:8001" #limitation the host machine needs to use 8001 port for supabase communication.
+
+    #using azure deployed api
+    #BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net" #Later the API should be passed using environment variables (easier change from dev to test or prod environment)
     key = endpoint.split("/")[-1]
     try:
         response = await client.get(BASE_URL + endpoint)
