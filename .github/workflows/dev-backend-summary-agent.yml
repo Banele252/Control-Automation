@@ -1,4 +1,4 @@
-name: Build and Push Interactive Agent Docker Image
+name: Build and Push Summary Agent Docker Image
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
       - task-43-agent-dev
     paths:
-      - 'BackEnd/Interactive_Agent/**'
+      - 'BackEnd/Summary_Agent/**'
 
 jobs:
   docker:
@@ -27,9 +27,9 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ${{secrets.DOCKER_USERNAME}}/controlacr:interactive-agent-dev ./BackEnd/Interactive_Agent/
+          docker build -t ${{secrets.DOCKER_USERNAME}}/controlacr:summary-agent-dev ./BackEnd/Summary_Agent/
 
       # Push Docker image
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/controlacr:interactive-agent-dev
+          docker push ${{ secrets.DOCKER_USERNAME }}/controlacr:summary-agent-dev

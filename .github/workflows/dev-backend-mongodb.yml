@@ -7,6 +7,10 @@ on:
       - task-43-agent-dev
     paths:
       - 'BackEnd/MongoDB/**'
+      
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   docker:
