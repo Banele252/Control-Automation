@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main
+      - task-43-agent-dev
 
 jobs:
   docker:
     runs-on: ubuntu-latest
+    environment: Test
 
     steps:
       # Checkout repository
