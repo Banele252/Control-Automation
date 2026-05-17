@@ -211,3 +211,6 @@ async def create_summary(input_endpoints:List[Dict], destination_endpoint:str):
 
 
 
+# Use this to test [
+#{"exception":"/data/exception"}, {"data":"/data/logic"}, {"dictionary":"/data/dictionary"}
+#]
