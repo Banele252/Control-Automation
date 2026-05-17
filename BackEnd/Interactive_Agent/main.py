@@ -9,11 +9,21 @@ import asyncio
 import httpx
 from typing import Any
 import os 
+from agent_config import system_prompt
+from fastapi import FastAPI, HTTPException, Depends
+from starlette import status
 
 #override default environment variables with .env file
 load_dotenv(override=True)
 
-#Planning to use OPEN AI agent SDK, therefore we need to create an anthropic client that is compatible with the openai agent sdk. 
+#Define the FastAPI application instance
+app = FastAPI()
+
+
+system_prompts = system_prompt(ALL_ENDPOINTS=["/data/exception", "/data/logic", "/data/dictionary", "/data/summary"])
+
+ALL_ENDPOINTS=["/data/exception", "/data/logic", "/data/dictionary", "/data/summary"]
+# Planning to use OPEN AI agent SDK, therefore we need to create an anthropic client that is compatible with the openai agent sdk. 
 # This will allow us to use the same codebase for both openai and anthropic models, and easily switch between them if needed.
 
 anthropic_client = AsyncOpenAI(
@@ -28,4 +38,92 @@ anthropic_model = OpenAIChatCompletionsModel(
             openai_client=anthropic_client,
             )
 openai_model = "gpt-4o-mini"
+
+#First tool 
+async def _fetch_one(client: httpx.AsyncClient, endpoint: str) -> tuple[str, Any]:
+    BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net"
+    key = endpoint.split("/")[-1]
+    try:
+        response = await client.get(BASE_URL + endpoint)
+        if response.status_code == 200:
+            return key, response.json()
+    except httpx.RequestError:
+        pass
+    return key, None
+
+@function_tool
+async def fetch_control_data(endpoints: list[str] | None = None) -> dict[str, Any]:
+    """
+    Fetch ControlWeb data from one or more endpoints concurrently.
+
+    Args:
+        endpoints: Subset of ['/data/exception', '/data/logic', '/data/dictionary'].
+                   Defaults to all three if not provided.
+
+    Returns:
+        Dict keyed by endpoint name ('exception', 'logic', 'dictionary').
+        Keys for failed/non-200 requests are omitted.
+    """
+    targets = endpoints if endpoints is not None else ALL_ENDPOINTS
+    async with httpx.AsyncClient() as client:
+        tasks = [_fetch_one(client, ep) for ep in targets]
+        results = await asyncio.gather(*tasks)
+    return {key: data for key, data in results if data is not None}
+
+tools = [fetch_control_data]
+
+#create the processing agent
+
+ai_processing = Agent(name="AI processing agent",
+                      instructions=system_prompts.processing_agent_prompt,
+                      tools=tools,
+                      model= anthropic_model,
+                      )
+# testing message
+#message = "How many exceptions are there?"
+
+
+handoff=ai_processing
+
+ai_assistent = Agent(name="AI assistant",
+                      instructions=system_prompts.receipent_agent_prompt,
+                      model= openai_model,
+                      handoffs=[handoff],
+                      handoff_description="Pass the rewritten instruction to the AI processing agent for execution.",
+                      )
+
+
+async def interactive_agents(message: str) -> str:
+    """Process a user message through the interactive agent workflow.
+    Args:
+        message: The original user query to be processed.
+    Returns:
+        The final output from the AI processing agent after handling the message.
+    """
+    with trace("testing preprod") as t:
+        rewritten_message = await Runner.run(ai_assistent,message)
+        return rewritten_message.final_output
+
+
+#print(asyncio.run(some_function()))
+
+@app.get("/interactive-agent",status_code= status.HTTP_200_OK)
+async def interactive_agent(message: str):
+    """
+    Endpoint to process a user message through the interactive agent workflow.
+
+    Args:
+        message: The original user query to be processed.
+
+    Returns:
+        The final output from the AI processing agent after handling the message.
+    """
+    try:
+        result = await interactive_agents(message=message)
+        return {"result": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
 
