@@ -47,9 +47,9 @@ overview_collection = db["dataset_overview"]
 dictionary_collection = db["data_dictionary"]
 anomaly_collection = db["anomaly_key"]
 
-# =========================
+# ========================
 # Agent Call Function
-# =========================
+# ========================
 
 async def generate_synthetic_data():
     with trace("Generating synthetic data"):
