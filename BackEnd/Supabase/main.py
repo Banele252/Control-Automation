@@ -14,6 +14,7 @@ from starlette import status
 from supabase_databases import SessionLocal
 from supabase_mapping import get_orm_model # this is used to get details of the ORL model
 
+
 # Provide a brief description of the task
 
 """

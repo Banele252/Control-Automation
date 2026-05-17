@@ -13,6 +13,7 @@ from agent_config import system_prompt
 from fastapi import FastAPI, HTTPException, Depends
 from starlette import status
 
+
 # Load the necessary keys
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
