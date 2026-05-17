@@ -13,6 +13,16 @@ from agent_config import system_prompt
 from fastapi import FastAPI, HTTPException, Depends
 from starlette import status
 
+# Load the necessary keys
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_HOST_POOL = os.getenv("SUPABASE_HOST_POOL")
+SUPABASE_DB_USER = os.getenv("SUPABASE_DB_USER")
+SUPABASE_DB_PASSWORD = os.getenv("SUPABASE_DB_PASSWORD")
+SUPABASE_SCHEMA = os.getenv("SUPABASE_SCHEMA")
+SUPABASE_CONTAINER = os.getenv("SUPABASE_CONTAINER")
+
+
 #override default environment variables with .env file
 load_dotenv(override=True)
 
@@ -41,7 +51,8 @@ openai_model = "gpt-4o-mini"
 
 #First tool 
 async def _fetch_one(client: httpx.AsyncClient, endpoint: str) -> tuple[str, Any]:
-    BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net"
+    BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net" #for modularity, will use docker container communication in prod.
+    #BASE_URL = f"http://{SUPABASE_CONTAINER}:8000" #for modularity, will use docker container communication in prod.
     key = endpoint.split("/")[-1]
     try:
         response = await client.get(BASE_URL + endpoint)
