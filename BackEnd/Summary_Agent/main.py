@@ -142,6 +142,13 @@ message = f"Call the rewrite_tool tool to extract the information to review, pro
 
 # Define the agent function
 async def review_agent(fraud_analyst, message):
+    """Process a user message through the review agent workflow.
+    Args:        
+        fraud_analyst: The agent responsible for reviewing the data.
+        message: The original user query to be processed.
+    Returns:         
+        The final output from the review agent after handling the message.
+    """
     with trace("Multi-agent outcome for reviewing data v2"):
         result = await Runner.run(fraud_analyst,message)
     return result
@@ -168,7 +175,14 @@ async def review_agent(fraud_analyst, message):
 
 @app.post("/summary-agent", status_code=status.HTTP_201_CREATED)
 async def create_summary(input_endpoints:List[Dict], destination_endpoint:str):
-
+    """
+    Endpoint to create a control summary based on specified endpoints and send it to a destination endpoint.
+    Args:
+        input_endpoints: A list of dictionaries containing the endpoints to fetch data from.
+        destination_endpoint: The endpoint to send the summary data to.
+    Returns:
+        A dictionary indicating the success of the operation.
+    """
     endpoint_list = [list(dict_item.values())[0] for dict_item in input_endpoints] # I need to optimise this later on.
 
 
