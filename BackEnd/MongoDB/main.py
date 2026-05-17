@@ -61,9 +61,9 @@ async def generate_synthetic_data():
     return result.final_output
 
 
-# =========================
+# ========================
 # API Endpoint
-# =========================
+# ========================
 
 @app.post("/AI_generated_data", status_code=status.HTTP_200_OK)
 async def insert_synthetic_data():
