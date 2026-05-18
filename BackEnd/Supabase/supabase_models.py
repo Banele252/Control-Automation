@@ -1,4 +1,4 @@
-from supabase_databases import Base, engine
+from .supabase_databases import Base, engine
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, FLOAT,TIMESTAMP
 from dotenv import load_dotenv
 import os

@@ -3,16 +3,17 @@
 
 # Import the required libraries.
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends
+from fastapi.encoders import jsonable_encoder
 import os
 from dotenv import load_dotenv
 import psycopg2
-from pydantic import BaseModel
+#from pydantic import BaseModel
 from typing import List, Dict, Annotated
 from sqlalchemy.orm import Session
 from starlette import status
-from supabase_databases import SessionLocal
-from supabase_mapping import get_orm_model # this is used to get details of the ORL model
+from .supabase_databases import SessionLocal
+from .supabase_mapping import get_orm_model # this is used to get details of the ORL model
 
 
 # Provide a brief description of the task
@@ -24,7 +25,11 @@ This is a wrapper Fast API to call supabase API and retrieve the stored in that 
 
 
 """
-app = FastAPI()
+router = APIRouter(
+    prefix="/supabase",
+    tags=["supabase"],
+    responses={404: {"description": "Not found"}},
+)
 
 def get_db(): # Creates a DB session 
     db = SessionLocal()
@@ -58,13 +63,69 @@ def connection_instant():
     return conn
 
 
+def fetch_table_data(table: str, db: Session | None = None):
+    owns_session = db is None
+    db = db or SessionLocal()
+    try:
+        return jsonable_encoder(db.query(get_orm_model(table)).all())
+    finally:
+        if owns_session:
+            db.close()
+
+
+def insert_table_rows(table: str, rows: List[Dict]):
+    if not rows:
+        return {"error": "No records provided"}
+
+    conn = None
+    cursor = None
+    try:
+        conn = connection_instant()
+        cursor = conn.cursor()
+
+        # Extract column names dynamically
+        columns = rows[0].keys()
+        col_names = ", ".join(columns)
+
+        # Build placeholder string: (%s, %s, %s)
+        placeholder = "(" + ", ".join(["%s"] * len(columns)) + ")"
+
+        # Convert list[dict] → list[tuples]
+        values = [tuple(row[col] for col in columns) for row in rows]
+
+        # AI - Build SQL
+        # Banele- The values section contains placeholders that equals to the number
+        # of records that will be inserted to the table.
+        # e.g., insert into a (b,c) values (%s, %s)* x ..[x can be any integer, let say 2]
+        # insert into a (b,c) values (%s, %s)* 2,  insert into a (b,c) values (%s, %s), (%s,%s)
+        query = f"""
+            INSERT INTO {SUPABASE_SCHEMA}.{table} ({col_names})
+            VALUES {",".join([placeholder] * len(values))}
+        """
+
+        # AI-Flatten all value tuples for psycopg2
+        # Banele - takes a list of tuple, iterates through the list and
+        # iterates through the each tuple extracting elements.
+        # Therefore, flatten is converting the List[tuples] to a list
+        flat_values = [item for tup in values for item in tup]
+
+        cursor.execute(query, flat_values)
+        conn.commit()
+        return {"status": "success", "inserted": len(rows)}
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
 ####
-#get data from  synthetic_data, control_dictionary, control_logic, 
+#get data from  synthetic_data, control_dictionary, control_logic,
 # control_exception
-@app.get("/data/{table}",status_code=status.HTTP_200_OK) #table can be synthetic_data, control_dictionary, control_logic, control_exception
+@router.get("/data/{table}",status_code=status.HTTP_200_OK) #table can be synthetic_data, control_dictionary, control_logic, control_exception
 def get_data(db:db_dependency ,table:str):
     try:
-        return db.query(get_orm_model(table)).all()
+        return fetch_table_data(table=table, db=db)
     except Exception as e:
         raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, 
@@ -76,7 +137,7 @@ def get_data(db:db_dependency ,table:str):
 #get data from  synthetic_data, control_dictionary, control_logic, 
 # control_exception
 '''
-@app.get("/data/{table}",status_code=status.HTTP_200_OK) #table can be synthetic_data, control_dictionary, control_logic, control_exception
+@router.get("/data/{table}",status_code=status.HTTP_200_OK) #table can be synthetic_data, control_dictionary, control_logic, control_exception
 async def get_data(table:str):
     try:
         conn=connection_instant() #creates a database instant.
@@ -98,55 +159,10 @@ async def get_data(table:str):
 #push data from synthetic_data, control_dictionary, control_logic
 
 
-@app.post("/insert/{table}", status_code=status.HTTP_201_CREATED) #very important: extracting column dynamically requires
+@router.post("/insert/{table}", status_code=status.HTTP_201_CREATED) #very important: extracting column dynamically requires
 #the order to be the same from the source to the target input.
 def insert_many(table: str, rows: List[Dict]):
-    if not rows:
-        return {"error": "No records provided"}
-
     try:
-        conn = connection_instant()
-        cursor = conn.cursor()
-
-        # Extract column names dynamically
-        columns = rows[0].keys()
-        col_names = ", ".join(columns)
-
-        # Build placeholder string: (%s, %s, %s)
-        placeholder = "(" + ", ".join(["%s"] * len(columns)) + ")"
-
-        # Convert list[dict] → list[tuples]
-        values = [tuple(row[col] for col in columns) for row in rows]
-
-        # AI - Build SQL
-        # Banele- The values section contains placeholders that equals to the number
-        # of records that will be inserted to the table. 
-        # e.g., insert into a (b,c) values (%s, %s)* x ..[x can be any integer, let say 2]
-        # insert into a (b,c) values (%s, %s)* 2,  insert into a (b,c) values (%s, %s), (%s,%s)
-        query = f"""
-            INSERT INTO {SUPABASE_SCHEMA}.{table} ({col_names})
-            VALUES {",".join([placeholder] * len(values))}
-        """
-
-        # AI-Flatten all value tuples for psycopg2
-        # Banele - takes a list of tuple, iterates through the list and
-        # iterates through the each tuple extracting elements. 
-        # Therefore, flatten is converting the List[tuples] to a list
-        flat_values = [item for tup in values for item in tup]
-
-        cursor.execute(query, flat_values)
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return {"status": "success", "inserted": len(rows)}
+        return insert_table_rows(table=table, rows=rows)
     except Exception as e:
         raise HTTPException(status_code=400,detail=str(e))
-
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except:
-            pass
-
-

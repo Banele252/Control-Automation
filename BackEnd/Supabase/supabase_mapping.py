@@ -1,4 +1,4 @@
-from supabase_models import SyntheticData, ControlDictionary, ControlLogic, ControlException, ControlSummary
+from .supabase_models import SyntheticData, ControlDictionary, ControlLogic, ControlException, ControlSummary
 
 
 

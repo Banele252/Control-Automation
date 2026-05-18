@@ -9,8 +9,8 @@ import asyncio
 import httpx
 from typing import Any
 import os 
-from agent_config import system_prompt
-from fastapi import FastAPI, HTTPException, Depends
+from .agent_config import system_prompt
+from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
 
 
@@ -28,7 +28,11 @@ SUPABASE_CONTAINER = os.getenv("SUPABASE_CONTAINER")
 load_dotenv(override=True)
 
 #Define the FastAPI application instance
-app = FastAPI()
+router = APIRouter(
+    prefix="/interactive-agent",
+    tags=["interactive-agent"],
+    responses={404: {"description": "Not found"}},
+)
 
 
 system_prompts = system_prompt(ALL_ENDPOINTS=["/data/exception", "/data/logic", "/data/dictionary", "/data/summary"])
@@ -52,8 +56,8 @@ openai_model = "gpt-4o-mini"
 
 #First tool 
 async def _fetch_one(client: httpx.AsyncClient, endpoint: str) -> tuple[str, Any]:
-    BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net" #for modularity, will use docker container communication in prod.
-    #BASE_URL = f"http://{SUPABASE_CONTAINER}:8000" #for modularity, will use docker container communication in prod.
+    #BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net" #for modularity, will use docker container communication in prod.
+    BASE_URL = f"http://{SUPABASE_CONTAINER}:8000" #for modularity, will use docker container communication in prod.
     key = endpoint.split("/")[-1]
     try:
         response = await client.get(BASE_URL + endpoint)
@@ -119,7 +123,7 @@ async def interactive_agents(message: str) -> str:
 
 #print(asyncio.run(some_function()))
 
-@app.get("/interactive-agent",status_code= status.HTTP_200_OK)
+@router.get("/interactive-agent",status_code= status.HTTP_200_OK)
 async def interactive_agent(message: str):
     """
     Endpoint to process a user message through the interactive agent workflow.

@@ -2,7 +2,7 @@
 
 # import libraries and connect mongodb
 
-from fastapi import FastAPI, HTTPException,Path,Query
+from fastapi import APIRouter, HTTPException,Path,Query
 from dotenv import load_dotenv
 import os
 from starlette import status
@@ -13,7 +13,11 @@ from config import agent_info
 
 load_dotenv()
 
-app = FastAPI()
+router = APIRouter(
+    prefix="/mongodb",
+    tags=["mongodb"],
+    responses={404: {"description": "Not found"}},
+)
 
 # =========================
 # Configure AI Agent
@@ -65,7 +69,7 @@ async def generate_synthetic_data():
 # API Endpoint
 # =======================
 
-@app.post("/AI_generated_data", status_code=status.HTTP_200_OK)
+@router.post("/AI_generated_data", status_code=status.HTTP_200_OK)
 async def insert_synthetic_data():
 
     try:
@@ -106,7 +110,7 @@ async def insert_synthetic_data():
             detail=f"Error encountered during processing: {str(e)}"
         )
 
-@app.get("/get_synthetic_data", status_code=status.HTTP_200_OK)
+@router.get("/get_synthetic_data", status_code=status.HTTP_200_OK)
 async def get_synthetic_data():
     try:
         # Fetch all records from MongoDB
@@ -124,7 +128,7 @@ async def get_synthetic_data():
             detail=f"Error encountered during data retrieval: {str(e)}"
         )
     
-@app.get("/get_overview", status_code=status.HTTP_200_OK)
+@router.get("/get_overview", status_code=status.HTTP_200_OK)
 async def get_overview():
     try:
         # Fetch all records from MongoDB
@@ -144,7 +148,7 @@ async def get_overview():
     
 
 
-@app.get("/get_dictionary", status_code=status.HTTP_200_OK)
+@router.get("/get_dictionary", status_code=status.HTTP_200_OK)
 async def get_data_dictionary():
     try:
         # Fetch all records from MongoDB
@@ -162,7 +166,7 @@ async def get_data_dictionary():
             detail=f"Error encountered during data retrieval: {str(e)}"
         )
 
-@app.get("/get_anomaly", status_code=status.HTTP_200_OK)
+@router.get("/get_anomaly", status_code=status.HTTP_200_OK)
 async def get_anomaly_data():
     try:
         # Fetch all records from MongoDB
@@ -179,7 +183,7 @@ async def get_anomaly_data():
             status_code=400,
             detail=f"Error encountered during data retrieval: {str(e)}"
         )
-@app.put("/update_record/{account_no}")
+@router.put("/update_record/{account_no}")
 async def update_data_record(account_no:str= Path(description="account number of the user")):
     filter = {"Account Number":account_no}
     update ={"$set":{"Review":True}}
