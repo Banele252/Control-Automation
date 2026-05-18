@@ -1,0 +1,35 @@
+name: Build and Push Summary Agent Docker Image
+
+on:
+  push:
+    branches:
+      - main
+      - task-43-agent-dev
+    paths:
+      - 'BackEnd/Summary_Agent/**'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    environment: Dev
+    steps:
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+
+      # Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ${{secrets.DOCKER_USERNAME}}/controlacr:summary-agent-dev ./BackEnd/Summary_Agent/
+
+      # Push Docker image
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/controlacr:summary-agent-dev
