@@ -1,11 +1,11 @@
 #import all necessary libraries and modules
-
 import os
 from dotenv import load_dotenv
 from agents import Agent, Runner,trace, function_tool
 from agents.models.openai_chatcompletions import OpenAIChatCompletionsModel
 from openai import AsyncOpenAI
 import asyncio
+import httpx
 from typing import Any
 from .agent_config import system_prompt 
 from pydantic import BaseModel,Field
@@ -13,11 +13,7 @@ from typing import Optional, List, Dict
 import requests
 from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
-try:
-    from Supabase.main import fetch_table_data, insert_table_rows
-except ImportError:
-    from ..Supabase.main import fetch_table_data, insert_table_rows
-#import json
+from sqlalchemy.orm import Session
 
 
 load_dotenv(override=True)
@@ -40,7 +36,7 @@ SUPABASE_HOST_POOL = os.getenv("SUPABASE_HOST_POOL")
 SUPABASE_DB_USER = os.getenv("SUPABASE_DB_USER")
 SUPABASE_DB_PASSWORD = os.getenv("SUPABASE_DB_PASSWORD")
 SUPABASE_SCHEMA = os.getenv("SUPABASE_SCHEMA")
-SUPABASE_ROUTER_PREFIX = os.getenv("SUPABASE_ROUTER_PREFIX", "/supabase").strip("/")
+SUPABASE_CONTAINER = os.getenv("SUPABASE_CONTAINER")
 
 
 # Connecting to the database using the raw table information 
@@ -78,20 +74,14 @@ openai_model = "gpt-4o-mini"
 ALL_ENDPOINTS = ["/data/exception", "/data/logic", "/data/dictionary"] #this needs to be  shared using an API.
 
 #[{"exception":"/data/exception"}, {"logic":"/data/logic"}, {"dict":"/data/dictionary"}] 
-#using shared Supabase router services inside the same FastAPI instance
+#using internal docker container communication
 
-def get_table_from_endpoint(endpoint: str, action: str) -> str:
-    endpoint_parts = endpoint.strip("/").split("/")
-    if endpoint_parts and endpoint_parts[0] == SUPABASE_ROUTER_PREFIX:
-        endpoint_parts = endpoint_parts[1:]
-    if len(endpoint_parts) != 2 or endpoint_parts[0] != action:
-        raise ValueError(f"Expected endpoint format '/{action}/<table>', got '{endpoint}'")
-    return endpoint_parts[1]
+BASE_URL = f"http://localhost:8000/supabase" #limitation the host machine needs to use 8001 port for supabase communication.
 
 #using the azure app deployed api 
 #BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net"
 
-async def _fetch_one(endpoint: str) -> tuple[str, Any]:
+async def _fetch_one(client: httpx.AsyncClient, endpoint: str) -> tuple[str, Any]:
     
     # using internal docker container communication
     #BASE_URL = f"http://{SUPABASE_CONTAINER}:8001" #limitation the host machine needs to use 8001 port for supabase communication.
@@ -100,9 +90,10 @@ async def _fetch_one(endpoint: str) -> tuple[str, Any]:
     #BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net" #Later the API should be passed using environment variables (easier change from dev to test or prod environment)
     key = endpoint.split("/")[-1]
     try:
-        table = get_table_from_endpoint(endpoint=endpoint, action="data")
-        return key, await asyncio.to_thread(fetch_table_data, table)
-    except Exception:
+        response = await client.get(BASE_URL + endpoint)
+        if response.status_code == 200:
+            return key, response.json()
+    except httpx.RequestError:
         pass
     return key, None
 
@@ -120,8 +111,9 @@ async def fetch_controlweb_data(endpoints: list[str] | None = None) -> dict[str,
         Keys for failed/non-200 requests are omitted.
     """
     targets = endpoints if endpoints is not None else ALL_ENDPOINTS
-    tasks = [_fetch_one(ep) for ep in targets]
-    results = await asyncio.gather(*tasks)
+    async with httpx.AsyncClient() as client:
+        tasks = [_fetch_one(client, ep) for ep in targets]
+        results = await asyncio.gather(*tasks)
     return {key: data for key, data in results if data is not None}
 
 
@@ -204,6 +196,8 @@ async def create_summary(input_endpoints:List[Dict], destination_endpoint:str):
     output_results: ControlSummary = result.final_output
     output_dictionary = output_results.model_dump()
 
+    URL = BASE_URL+ destination_endpoint
+
     # It best practice to mix sync and async code
     #try: 
     #    requests.post(url=URL,json=[output_dictionary])
@@ -211,10 +205,11 @@ async def create_summary(input_endpoints:List[Dict], destination_endpoint:str):
     #except Exception as e:
     #    raise HTTPException(status_code=400, detail=str(e))
     
-    # implementing the async version
+     # implementing the async version
     try:
-        table = get_table_from_endpoint(endpoint=destination_endpoint, action="insert")
-        return await asyncio.to_thread(insert_table_rows, table, [output_dictionary])
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url=URL, json=[output_dictionary])
+            return{"status":"success"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
