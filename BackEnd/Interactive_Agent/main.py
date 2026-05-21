@@ -7,12 +7,15 @@ from openai import AsyncOpenAI
 import requests
 import asyncio
 import httpx
-from typing import Any
+from typing import Annotated, Any
 import os 
 from .agent_config import system_prompt
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
+from Supabase.supabase_databases import SessionLocal
+from Supabase.main import fetch_table_data
 from starlette import status
 
+load_dotenv(override=True)
 
 # Load the necessary keys
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -25,7 +28,7 @@ SUPABASE_CONTAINER = os.getenv("SUPABASE_CONTAINER")
 
 
 #override default environment variables with .env file
-load_dotenv(override=True)
+
 
 #Define the FastAPI application instance
 router = APIRouter(
@@ -33,6 +36,8 @@ router = APIRouter(
     tags=["interactive-agent"],
     responses={404: {"description": "Not found"}},
 )
+
+
 
 
 system_prompts = system_prompt(ALL_ENDPOINTS=["/data/exception", "/data/logic", "/data/dictionary", "/data/summary"])
@@ -57,12 +62,15 @@ openai_model = "gpt-4o-mini"
 #First tool 
 async def _fetch_one(client: httpx.AsyncClient, endpoint: str) -> tuple[str, Any]:
     #BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net" #for modularity, will use docker container communication in prod.
-    BASE_URL = f"http://{SUPABASE_CONTAINER}:8000" #for modularity, will use docker container communication in prod.
+    #BASE_URL = f"http://localhost:8000/supabase" #for modularity, will use docker container communication in prod.
     key = endpoint.split("/")[-1]
     try:
-        response = await client.get(BASE_URL + endpoint)
-        if response.status_code == 200:
-            return key, response.json()
+        db = SessionLocal()        
+        try:
+            response = await asyncio.to_thread(fetch_table_data, table=key, db=db)
+            return key, response
+        finally:
+            db.close() 
     except httpx.RequestError:
         pass
     return key, None

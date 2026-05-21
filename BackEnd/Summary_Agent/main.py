@@ -11,7 +11,9 @@ from .agent_config import system_prompt
 from pydantic import BaseModel,Field
 from typing import Optional, List, Dict 
 import requests
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
+from Supabase.supabase_databases import SessionLocal
+from Supabase.main import insert_table_rows, fetch_table_data
 from starlette import status
 from sqlalchemy.orm import Session
 
@@ -90,9 +92,12 @@ async def _fetch_one(client: httpx.AsyncClient, endpoint: str) -> tuple[str, Any
     #BASE_URL = "https://controldev-apfxc7h7etf4breb.southafricanorth-01.azurewebsites.net" #Later the API should be passed using environment variables (easier change from dev to test or prod environment)
     key = endpoint.split("/")[-1]
     try:
-        response = await client.get(BASE_URL + endpoint)
-        if response.status_code == 200:
-            return key, response.json()
+        db = SessionLocal()        
+        try:
+            response = await asyncio.to_thread(fetch_table_data, table=key, db=db)
+            return key, response
+        finally:
+            db.close() 
     except httpx.RequestError:
         pass
     return key, None
@@ -195,7 +200,7 @@ async def create_summary(input_endpoints:List[Dict], destination_endpoint:str):
 
     output_results: ControlSummary = result.final_output
     output_dictionary = output_results.model_dump()
-
+    key = destination_endpoint.split("/")[-1]
     URL = BASE_URL+ destination_endpoint
 
     # It best practice to mix sync and async code
@@ -207,8 +212,13 @@ async def create_summary(input_endpoints:List[Dict], destination_endpoint:str):
     
      # implementing the async version
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(url=URL, json=[output_dictionary])
+      
+        db = SessionLocal()        
+        try:
+            response = await asyncio.to_thread(insert_table_rows, table=key, rows=[output_dictionary], db=db)
+            return key, response
+        finally:
+            db.close() 
             return{"status":"success"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
