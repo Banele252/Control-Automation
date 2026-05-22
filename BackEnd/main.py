@@ -10,7 +10,6 @@ app = FastAPI()
 async def healthy_check():
     return {"message": "Healthy"}
 
-
 app.include_router(interactive_main.router)
 app.include_router(summary_main.router)
 app.include_router(supabase_main.router)

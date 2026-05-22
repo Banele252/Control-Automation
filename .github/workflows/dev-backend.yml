@@ -27,7 +27,7 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ${{secrets.DOCKER_USERNAME}}/controlacr:interactive-agent-dev ./BackEnd/
+          docker build -t ${{secrets.DOCKER_USERNAME}}/controlacr:BackEnd-dev ./BackEnd/
 
       # Push Docker image
       - name: Push Docker image
