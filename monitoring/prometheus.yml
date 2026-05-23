@@ -4,4 +4,4 @@ global:
 scrape_configs:
   - job_name: "fastapi"
     static_configs:
-      - targets: ["backEnd:8000"]  # "app" = docker service name
+      - targets: ["backend:8000"]  # "app" = docker service name
