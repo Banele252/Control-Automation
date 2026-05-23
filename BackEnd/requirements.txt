@@ -3,10 +3,6 @@ psycopg2-binary==2.9.11
 pydantic==2.13.3
 python-dotenv==1.2.2
 SQLAlchemy==2.0.48
-starlette==1.0.0
-typing-inspection==0.4.2
-typing_extensions==4.15.0
-starlette==1.0.0
 uvicorn[standard]==0.30.6
 openai-agents==0.0.19
 anthropic==0.97.0
@@ -14,9 +10,9 @@ httpx==0.28.1
 openai==2.33.0
 Requests==2.33.1
 python-dotenv==1.2.2
-dotenv==0.9.9
-httpx==0.28.1
 types-requests==2.33.0.20260408
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 motor==3.7.1
+prometheus_client==0.25.0
+prometheus-fastapi-instrumentator==7.1.0

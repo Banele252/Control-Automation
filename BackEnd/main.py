@@ -2,9 +2,11 @@ from fastapi import FastAPI, HTTPException, Depends
 from Interactive_Agent import main as interactive_main
 from Summary_Agent import main as summary_main
 from Supabase import main as supabase_main
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
 
+Instrumentator().instrument(app).expose(app)
 
 @app.get("/healthy-check")
 async def healthy_check():
