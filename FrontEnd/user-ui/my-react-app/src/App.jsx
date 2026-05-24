@@ -59,7 +59,13 @@ const timeline = [
   ['13:00', 'Owner attestation due', '6 teams pending'],
 ]
 
-const navItems = ['Overview', 'Controls', 'Exceptions', 'Evidence', 'Settings']
+const navItems = [
+  { label: 'Overview', icon: '⌂' },
+  { label: 'Controls', icon: '▦' },
+  { label: 'Exceptions', icon: '!' },
+  { label: 'Evidence', icon: '◫' },
+  { label: 'Settings', icon: '⚙' },
+]
 
 const statTone = {
   good: 'text-[#10a37f]',
@@ -74,28 +80,42 @@ const ghostButtonClass = 'min-h-[38px] rounded-lg border border-[#e4e1da] bg-whi
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   return (
-    <main className={`${isDarkMode ? 'dark' : ''} grid min-h-svh grid-cols-[248px_minmax(0,1fr)] bg-[#f7f7f4] bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34rem)] text-[#525252] transition-colors duration-300 dark:bg-[#0f1110] dark:bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_34rem)] dark:text-[#c9cbc8] max-[1120px]:grid-cols-1`}>
-      <aside className="sticky top-0 flex h-svh flex-col gap-7 border-r border-[#e4e1da] bg-[#fafaf8]/75 p-6 backdrop-blur-xl transition-colors duration-300 dark:border-[#29302d] dark:bg-[#141715]/80 max-[1120px]:static max-[1120px]:h-auto max-[1120px]:flex-row max-[1120px]:items-center max-[1120px]:p-4 max-[720px]:flex-col max-[720px]:items-start max-[720px]:gap-3.5" aria-label="Revenue assurance navigation">
-        <div className="flex items-center gap-2.5 font-semibold text-[#111111] dark:text-[#f3f4f2]">
+    <main className={`${isDarkMode ? 'dark' : ''} grid min-h-svh ${isSidebarCollapsed ? 'grid-cols-[76px_minmax(0,1fr)]' : 'grid-cols-[248px_minmax(0,1fr)]'} bg-[#f7f7f4] bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34rem)] text-[#525252] transition-[grid-template-columns,background-color,color] duration-300 dark:bg-[#0f1110] dark:bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_34rem)] dark:text-[#c9cbc8] max-[1120px]:grid-cols-1`}>
+      <aside className={`sticky top-0 flex h-svh flex-col border-r border-[#e4e1da] bg-[#fafaf8]/75 backdrop-blur-xl transition-all duration-300 dark:border-[#29302d] dark:bg-[#141715]/80 ${isSidebarCollapsed ? 'gap-4 p-4' : 'gap-7 p-6'} max-[1120px]:static max-[1120px]:h-auto max-[1120px]:flex-row max-[1120px]:items-center max-[1120px]:p-4 max-[720px]:flex-col max-[720px]:items-start max-[720px]:gap-3.5`} aria-label="Revenue assurance navigation">
+        <div className={`flex items-center gap-2.5 font-semibold text-[#111111] dark:text-[#f3f4f2] ${isSidebarCollapsed ? 'flex-col justify-center' : 'justify-between'} max-[1120px]:flex-row max-[1120px]:justify-start`}>
+          <div className="flex min-w-0 items-center gap-2.5">
           <span className="grid h-[34px] w-[34px] place-items-center rounded-full border border-[#cfcbc1] text-[22px] text-[#10a37f] dark:border-[#3a423f]">◎</span>
-          <span>ControlAI</span>
+            <span className={`${isSidebarCollapsed ? 'sr-only' : 'block'} max-[1120px]:not-sr-only`}>ControlAI</span>
+          </div>
+          <button
+            className="grid h-8 w-8 place-items-center rounded-lg border border-[#e4e1da] bg-white/90 text-[#111111] transition hover:-translate-y-px hover:shadow-[0_14px_32px_rgba(17,17,17,0.1)] dark:border-[#29302d] dark:bg-[#1a1e1c] dark:text-[#f3f4f2] max-[1120px]:hidden"
+            type="button"
+            aria-label={isSidebarCollapsed ? 'Expand sidepane' : 'Collapse sidepane'}
+            aria-expanded={!isSidebarCollapsed}
+            onClick={() => setIsSidebarCollapsed((currentValue) => !currentValue)}
+          >
+            {isSidebarCollapsed ? '›' : '‹'}
+          </button>
         </div>
-        <nav className="grid gap-1 max-[1120px]:flex max-[1120px]:overflow-x-auto max-[720px]:w-full">
+        <nav className={`grid gap-1 max-[1120px]:flex max-[1120px]:overflow-x-auto max-[720px]:w-full ${isSidebarCollapsed ? 'justify-items-center' : ''}`}>
           {navItems.map((item) => (
             <a
-              className={`rounded-lg px-3 py-2.5 text-sm no-underline transition hover:bg-white/90 hover:text-[#111111] dark:hover:bg-[#1d221f] dark:hover:text-[#f3f4f2] ${
-                item === 'Overview' ? 'bg-white/90 text-[#111111] dark:bg-[#1d221f] dark:text-[#f3f4f2]' : 'text-[#525252] dark:text-[#c9cbc8]'
+              className={`flex items-center gap-2.5 rounded-lg text-sm no-underline transition hover:bg-white/90 hover:text-[#111111] dark:hover:bg-[#1d221f] dark:hover:text-[#f3f4f2] ${isSidebarCollapsed ? 'h-10 w-10 justify-center p-0' : 'px-3 py-2.5'} max-[1120px]:h-auto max-[1120px]:w-auto max-[1120px]:justify-start max-[1120px]:px-3 max-[1120px]:py-2.5 ${
+                item.label === 'Overview' ? 'bg-white/90 text-[#111111] dark:bg-[#1d221f] dark:text-[#f3f4f2]' : 'text-[#525252] dark:text-[#c9cbc8]'
               }`}
-              href={`#${item.toLowerCase()}`}
-              key={item}
+              href={`#${item.label.toLowerCase()}`}
+              key={item.label}
+              title={isSidebarCollapsed ? item.label : undefined}
             >
-              {item}
+              <span aria-hidden="true">{item.icon}</span>
+              <span className={`${isSidebarCollapsed ? 'sr-only' : 'block'} max-[1120px]:not-sr-only`}>{item.label}</span>
             </a>
           ))}
         </nav>
-        <div className="mt-auto rounded-lg border border-[#e4e1da] bg-white/90 p-4 text-left dark:border-[#29302d] dark:bg-[#1a1e1c] max-[1120px]:hidden">
+        <div className={`${isSidebarCollapsed ? 'hidden' : 'block'} mt-auto rounded-lg border border-[#e4e1da] bg-white/90 p-4 text-left dark:border-[#29302d] dark:bg-[#1a1e1c] max-[1120px]:hidden`}>
           <span className="block text-xs text-[#77736c] dark:text-[#8f9691]">Current cycle</span>
           <strong className="mt-2 mb-0.5 block text-[#111111] dark:text-[#f3f4f2]">May revenue close</strong>
           <small className="block text-xs text-[#77736c] dark:text-[#8f9691]">72% complete</small>
