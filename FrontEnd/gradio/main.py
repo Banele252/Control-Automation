@@ -11,7 +11,7 @@ backend_container = os.getenv("BACKEND_CONTAINER", "localhost")
 def chat(message, history):
     messages = message
     BaseURL = f"http://{backend_container}:{port}" # use this in production
-    #BaseURL = f"http://localhost:8000" # to be used in local development.
+    #BaseURL = f"http://localhost:8000" # to be used in local development..
     endpoint = "/interactive-agent/interactive-agent"
     url = BaseURL + endpoint
     params = {
