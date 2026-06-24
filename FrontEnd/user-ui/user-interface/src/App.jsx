@@ -81,6 +81,22 @@ const ghostButtonClass = 'min-h-[38px] rounded-lg border border-[#e4e1da] bg-whi
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [exceptions, setException] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Simulate fetching exceptions from an API
+    async function fetchExceptions() {
+      setLoading(true)
+      const response = await fetch('http://localhost:8000/supabase/data/exception')
+      const data = await response.json()
+      setException(data)
+      setLoading(false)
+      console.log('Fetched exceptions:', data)
+    }
+
+    fetchExceptions()
+  }, [])
 
   return (
     <main className={`${isDarkMode ? 'dark' : ''} grid min-h-svh ${isSidebarCollapsed ? 'grid-cols-[76px_minmax(0,1fr)]' : 'grid-cols-[248px_minmax(0,1fr)]'} bg-[#f7f7f4] bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34rem)] text-[#525252] transition-[grid-template-columns,background-color,color] duration-300 dark:bg-[#0f1110] dark:bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_34rem)] dark:text-[#c9cbc8] max-[1120px]:grid-cols-1`}>
@@ -245,8 +261,20 @@ function App() {
               </div>
             </section>
           </aside>
+            <div>
+        {loading && <p>Loading...</p>}
+        {!loading && exceptions.length === 0? 
+            <p>No exceptions found.</p>:
+            exceptions.map((exception) => (
+              <div key={exception.account_number}>
+                <h3>{exception.email}</h3>
+                <p>{exception.status}</p>
+              </div>
+            )) }
+      </div>
         </section>
       </section>
+    
     </main>
   )
 }

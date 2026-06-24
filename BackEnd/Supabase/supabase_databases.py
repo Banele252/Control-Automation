@@ -28,7 +28,15 @@ url = URL.create(
     database="postgres"
 )
 
-engine = create_engine(url, connect_args={"sslmode":"require"})
+engine = create_engine(
+                        url,
+                        connect_args={"sslmode":"require"},
+                        pool_pre_ping=True,       # validates connection before using it
+                        pool_size=5,              # max persistent connections
+                        max_overflow=2,           # extra connections allowed under load
+                        pool_recycle=300,         # recycle connections every 5 mins
+                        pool_timeout=30, 
+                        )
 
 SessionLocal =  sessionmaker(autoflush=False, autocommit=False, bind=engine)
 
