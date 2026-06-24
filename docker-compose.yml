@@ -13,5 +13,6 @@ services:
     build: ./FrontEnd/gradio
     ports:
       - "7861:7861"
-    env_file:
-      - .env
+    environment:
+      - BACKEND_CONTAINER=backend
+      - BACKEND_PORT=8000

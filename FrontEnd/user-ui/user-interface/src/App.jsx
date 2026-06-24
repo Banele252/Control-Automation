@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const controlStats = [
   { label: 'Revenue at risk', value: '$2.84M', trend: '-18%', tone: 'high' },
