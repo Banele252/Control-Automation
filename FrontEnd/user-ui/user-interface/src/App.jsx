@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-
+import ChatInterface from './component/ChatInterface'
+import { fetchExceptionsHTTP } from './https/http'
 const controlStats = [
   { label: 'Revenue at risk', value: '$2.84M', trend: '-18%', tone: 'high' },
   { label: 'Controls healthy', value: '91.6%', trend: '+4.2%', tone: 'good' },
@@ -88,11 +89,15 @@ function App() {
     // Simulate fetching exceptions from an API
     async function fetchExceptions() {
       setLoading(true)
-      const response = await fetch('http://localhost:8000/supabase/data/exception')
-      const data = await response.json()
-      setException(data)
-      setLoading(false)
-      console.log('Fetched exceptions:', data)
+      try {
+        const data = await fetchExceptionsHTTP()
+        console.log('Fetched exceptions:', data)
+        setException(data)
+      } catch (error) {
+        console.error('Error fetching exceptions:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchExceptions()
@@ -242,38 +247,36 @@ function App() {
               <button className="min-h-[38px] rounded-lg bg-white px-4 font-semibold text-[#111111] transition hover:-translate-y-px hover:shadow-[0_14px_32px_rgba(17,17,17,0.1)]" type="button">Draft remediation</button>
             </section>
 
+          
+
             <section className={panelClass} id="exceptions">
               <div className="mb-3 flex items-center justify-between gap-4">
                 <div>
                   <p className={eyebrowClass}>Exceptions</p>
-                  <h2 className="text-xl leading-tight font-semibold text-[#111111] dark:text-[#f3f4f2]">Live alerts</h2>
+                  <h2 className="text-xl leading-tight font-semibold text-[#111111] dark:text-[#f3f4f2]">Alerts</h2>
                 </div>
-                <span className="grid h-7 min-w-7 place-items-center rounded-full bg-[rgba(16,163,127,0.12)] font-bold text-[#08745c] dark:bg-[rgba(16,185,129,0.18)] dark:text-[#5ee0be]">3</span>
+                <span className="grid h-7 min-w-7 place-items-center rounded-full bg-[rgba(16,163,127,0.12)] font-bold text-[#08745c] dark:bg-[rgba(16,185,129,0.18)] dark:text-[#5ee0be]">{exceptions.length}</span>
               </div>
               <div className="grid gap-2.5">
-                {alerts.map((alert) => (
-                  <article className="rounded-lg border border-[#e4e1da] bg-[#fbfbf8] p-3.5 dark:border-[#29302d] dark:bg-[#202622]" key={alert.title}>
-                    <strong className="block font-semibold text-[#111111] dark:text-[#f3f4f2]">{alert.title}</strong>
-                    <span className="text-[#77736c] dark:text-[#8f9691]">{alert.detail}</span>
-                    <time className="mt-2 block text-xs text-[#77736c] dark:text-[#8f9691]">{alert.time}</time>
+                {loading && <p className = 'rounded-lg border border-[#e4e1da] bg-[#fbfbf8] p-3.5 dark:border-[#29302d] dark:bg-[#202622]'>Loading...</p>}
+                {!loading && exceptions.map((exception) => (
+                  <article className="rounded-lg border border-[#e4e1da] bg-[#fbfbf8] p-3.5 dark:border-[#29302d] dark:bg-[#202622]" key={exception.user_id}>
+                    <strong className="block font-semibold text-[#111111] dark:text-[#f3f4f2]">{exception.account_number}</strong>
+                    <span className="text-[#77736c] dark:text-[#8f9691]">{exception.email}</span>
+                    <time className="mt-2 block text-xs text-[#77736c] dark:text-[#8f9691]">{exception.timestamp}</time>
+                    <span className="mt-2 block text-xs text-[#77736c] dark:text-[#8f9691]">{exception.status}</span>
                   </article>
                 ))}
               </div>
             </section>
           </aside>
-            <div>
-        {loading && <p>Loading...</p>}
-        {!loading && exceptions.length === 0? 
-            <p>No exceptions found.</p>:
-            exceptions.map((exception) => (
-              <div key={exception.account_number}>
-                <h3>{exception.email}</h3>
-                <p>{exception.status}</p>
-              </div>
-            )) }
-      </div>
         </section>
       </section>
+      <div className= "mt-10">
+      </div>
+       <ChatInterface/>
+
+     
     
     </main>
   )
