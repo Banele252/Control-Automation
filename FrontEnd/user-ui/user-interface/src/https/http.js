@@ -1,6 +1,6 @@
 
 export async function fetchExceptionsHTTP () {
-    const response = await fetch('http://localhost:8000/supabase/data/exception')
+    const response = await fetch('http://localhost:' + import.meta.env.VITE_BACKEND_PORT + '/supabase/data/exception')
     const exceptions = await response.json()
     
     if(!response.ok) {
@@ -11,7 +11,7 @@ export async function fetchExceptionsHTTP () {
 }
 
 export async function fetchChatResponseHTTP(userMessage){
-    const response = await fetch('http://localhost:8000/interactive-agent/interactive-agent?message=' + encodeURIComponent(userMessage), {
+    const response = await fetch('http://localhost:' + import.meta.env.VITE_BACKEND_PORT + '/interactive-agent/interactive-agent?message=' + encodeURIComponent(userMessage), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

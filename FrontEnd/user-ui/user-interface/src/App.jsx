@@ -215,24 +215,7 @@ function App() {
                   </div>
                 ))}
               </div>
-            </section>
-
-            <section className={`${panelClass} grid grid-cols-[220px_minmax(0,1fr)] gap-6 max-[720px]:grid-cols-1`} id="evidence">
-              <div>
-                <p className={eyebrowClass}>Close workflow</p>
-                <h2 className="text-xl leading-tight font-semibold text-[#111111] dark:text-[#f3f4f2]">Reconciliation timeline</h2>
-              </div>
-              <div className="grid gap-3">
-                {timeline.map(([time, title, detail]) => (
-                  <div className="grid grid-cols-[62px_minmax(0,1fr)] items-start gap-3.5" key={time}>
-                    <time className="font-bold text-[#08745c] dark:text-[#5ee0be]">{time}</time>
-                    <div>
-                      <strong className="block font-semibold text-[#111111] dark:text-[#f3f4f2]">{title}</strong>
-                      <span className="text-[#77736c] dark:text-[#8f9691]">{detail}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    <h1>hello, world!</h1>
             </section>
           </div>
 
@@ -270,14 +253,11 @@ function App() {
               </div>
             </section>
           </aside>
+          <ChatInterface/>
         </section>
       </section>
-      <div className= "mt-10">
-      </div>
-       <ChatInterface/>
-
-     
     
+     
     </main>
   )
 }
