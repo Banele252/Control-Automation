@@ -7,12 +7,18 @@ services:
       - "8000:8000"
     env_file:
       - .env
-  frontend:
-    depends_on:
-      - backend
-    build: ./FrontEnd/gradio
-    ports:
-      - "7861:7861"
-    environment:
-      - BACKEND_CONTAINER=backend
-      - BACKEND_PORT=8000
+
+#  frontend:
+#    depends_on:
+#      - backend
+#    image: react-frontend-ui-dev-v1.2.0
+    #build:
+    #  context: ./FrontEnd/user-ui/user-interface
+    #  args:
+    #    BACKEND_CONTAINER: backend
+    #    BACKEND_PORT: 8000
+#    ports:
+#      - "3000:3000"
+#    environment:
+#      - BACKEND_CONTAINER=backend
+#      - BACKEND_PORT=8000
